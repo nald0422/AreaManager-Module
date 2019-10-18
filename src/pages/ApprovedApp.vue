@@ -189,7 +189,14 @@ export default {
   },
 
   created() {
-      var url = this.baseUri.concat(this.amId, this.dateFrom, this.dateTo);
+        var url = this.baseUri.concat(this.amId, this.dateFrom, this.dateTo);
+
+        axios
+        .get(url)
+        .then(response => {
+            this.approvedApp_data = response["data"]
+        })
+        .catch(error => console.log(error));
   }
 }
 </script>
