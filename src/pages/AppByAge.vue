@@ -49,8 +49,6 @@
 
 <script>
 
-import axios from 'axios';
-
 export default {
   data () {
     return {
@@ -190,7 +188,7 @@ export default {
     created() {
             var url = this.baseUri.concat("areamanager/query/age/"+this.amId+"/"+this.dateFrom+"/"+this.dateTo);
 
-            axios
+            this.$axios
             .get(url)
             .then(response => {
                 this.approvedApp_data = response["data"]

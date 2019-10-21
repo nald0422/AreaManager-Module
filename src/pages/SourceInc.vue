@@ -2,24 +2,22 @@
     <div class="q-pa-md">
     <q-table
       title="Treats"
-      :data="data"
+      :data="source_data"
       :columns="columns"
-      row-key="name"
+      row-key="id"
+      :loading="loading"
       :visible-columns="visibleColumns"
     >
       <template v-slot:top="props">
-        <div class="col-2 q-table__title">Treats</div>
+        <div class="col-2 q-table__title">Approved Applications</div>
 
         <q-space />
 
         <div v-if="$q.screen.gt.xs" class="col">
-          <q-toggle v-model="visibleColumns" val="calories" label="Calories" />
-          <q-toggle v-model="visibleColumns" val="fat" label="Fat" />
-          <q-toggle v-model="visibleColumns" val="carbs" label="Carbs" />
-          <q-toggle v-model="visibleColumns" val="protein" label="Protein" />
-          <q-toggle v-model="visibleColumns" val="sodium" label="Sodium" />
-          <q-toggle v-model="visibleColumns" val="calcium" label="Calcium" />
-          <q-toggle v-model="visibleColumns" val="iron" label="Iron" />
+          <q-toggle v-model="visibleColumns" val="userId" label="User Id" />
+          <q-toggle v-model="visibleColumns" val="id" label="ID" />
+          <q-toggle v-model="visibleColumns" val="title" label="Title" />
+          <q-toggle v-model="visibleColumns" val="body" label="Body" />
         </div>
         <q-select
           v-else
@@ -38,143 +36,104 @@
 
         <q-btn
           flat round dense
+          icon="edit"
+          class="q-ml-md"
+        />
+
+        <q-btn
+          flat round dense
+          icon="print"
+          class="q-ml-md"
+        />
+
+        <q-btn
+          flat round dense
           :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
           @click="props.toggleFullscreen"
           class="q-ml-md"
         />
       </template>
 
+      <template v-slot:body="props">
+        <q-tr :props="props">
+          <q-td key="userId" :props="props">{{ props.row.userId }}</q-td>
+          <q-td key="id" :props="props">{{ props.row.id }}</q-td>
+          <q-td key="title" class="text-ellipsis" :props="props">
+            {{ props.row.title }}
+            <q-popup-edit v-model="props.row.title">
+              <span>{{ props.row.title }}</span>
+            </q-popup-edit>
+          </q-td>
+          <q-td key="body" class="text-ellipsis" :props="props">
+            {{ props.row.body }}
+            <q-popup-edit v-model="props.row.body">
+              <span>{{ props.row.body }}</span>
+            </q-popup-edit>
+          </q-td>
+          <q-td key="action" :props="props" class="q-gutter-xs" style="min-width: 140px;">
+            <q-btn
+              color="primary"
+              class="btn-action"
+              icon="visibility"
+              size="sm"
+              @click="onView(props.row)"
+            />
+            <q-btn
+              color="secondary"
+              class="btn-action"
+              icon="edit"
+              size="sm"
+              @click="onUpdate(props.row)"
+            />
+            <q-btn
+              color="deep-orange"
+              class="btn-action"
+              icon="delete"
+              size="sm"
+              @click="onDelete(props.row)"
+            />
+          </q-td>
+        </q-tr>
+      </template>
     </q-table>
   </div>
 </template>
 
 <script>
-
-import axios from 'axios';
-
 export default {
   data () {
     return {
-      visibleColumns: ['calories', 'desc', 'fat', 'carbs', 'protein', 'sodium', 'calcium', 'iron'],
+      visibleColumns: ['userId', 'id', 'title', 'body'],
       columns: [
         {
-          name: 'desc',
-          required: true,
-          label: 'Dessert (100g serving)',
-          align: 'left',
-          field: row => row.name,
-          format: val => `${val}`,
-          sortable: true
-        },
-        { name: 'calories', align: 'center', label: 'Calories', field: 'calories', sortable: true },
-        { name: 'fat', label: 'Fat (g)', field: 'fat', sortable: true },
-        { name: 'carbs', label: 'Carbs (g)', field: 'carbs' },
-        { name: 'protein', label: 'Protein (g)', field: 'protein' },
-        { name: 'sodium', label: 'Sodium (mg)', field: 'sodium' },
-        { name: 'calcium', label: 'Calcium (%)', field: 'calcium', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) },
-        { name: 'iron', label: 'Iron (%)', field: 'iron', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) }
-      ],
-      data: [
-        {
-          name: 'Frozen Yogurt',
-          calories: 159,
-          fat: 6.0,
-          carbs: 24,
-          protein: 4.0,
-          sodium: 87,
-          calcium: '14%',
-          iron: '1%'
+            name: "userId",
+            align: "left",
+            label: "User Id",
+            field: "userId",
+            sortable: true
         },
         {
-          name: 'Ice cream sandwich',
-          calories: 237,
-          fat: 9.0,
-          carbs: 37,
-          protein: 4.3,
-          sodium: 129,
-          calcium: '8%',
-          iron: '1%'
+            name: "id",
+            align: "left",
+            label: "ID",
+            field: "id",
+            sortable: true
         },
         {
-          name: 'Eclair',
-          calories: 262,
-          fat: 16.0,
-          carbs: 23,
-          protein: 6.0,
-          sodium: 337,
-          calcium: '6%',
-          iron: '7%'
+            name: "title",
+            align: "left",
+            label: "Title",
+            field: "title",
+            sortable: true
         },
         {
-          name: 'Cupcake',
-          calories: 305,
-          fat: 3.7,
-          carbs: 67,
-          protein: 4.3,
-          sodium: 413,
-          calcium: '3%',
-          iron: '8%'
+            name: "body",
+            align: "left",
+            label: "Body",
+            field: "body",
+            sortable: true
         },
-        {
-          name: 'Gingerbread',
-          calories: 356,
-          fat: 16.0,
-          carbs: 49,
-          protein: 3.9,
-          sodium: 327,
-          calcium: '7%',
-          iron: '16%'
-        },
-        {
-          name: 'Jelly bean',
-          calories: 375,
-          fat: 0.0,
-          carbs: 94,
-          protein: 0.0,
-          sodium: 50,
-          calcium: '0%',
-          iron: '0%'
-        },
-        {
-          name: 'Lollipop',
-          calories: 392,
-          fat: 0.2,
-          carbs: 98,
-          protein: 0,
-          sodium: 38,
-          calcium: '0%',
-          iron: '2%'
-        },
-        {
-          name: 'Honeycomb',
-          calories: 408,
-          fat: 3.2,
-          carbs: 87,
-          protein: 6.5,
-          sodium: 562,
-          calcium: '0%',
-          iron: '45%'
-        },
-        {
-          name: 'Donut',
-          calories: 452,
-          fat: 25.0,
-          carbs: 51,
-          protein: 4.9,
-          sodium: 326,
-          calcium: '2%',
-          iron: '22%'
-        },
-        {
-          name: 'KitKat',
-          calories: 518,
-          fat: 26.0,
-          carbs: 65,
-          protein: 7,
-          sodium: 54,
-          calcium: '12%',
-          iron: '6%'
-        }
+        { name: "action", align: "center", label: "Action" }
       ],
       source_list: [],
       source_data: [],
@@ -193,7 +152,7 @@ export default {
     method: {
         getSourceOfIncome(income) {
             var url = this.baseUri.concat(income+"/"+amId+"/"+dateFrom+"/"+dateTo);
-                axios
+                this.$axios
                 .get(url)
                 .then(response => {
                     this.source_data = response["date"]
@@ -203,15 +162,14 @@ export default {
     },
 
     created() {
-            var url = this.baseUri.concat("areamanager/query/sourceincome/list");
-
-            axios
-            .get(url)
-            .then(response => {
-                this.source_list = response["data"]
+        this.$axios
+        .get("https://jsonplaceholder.typicode.com/posts")
+        .then(response => {
+            // console.log(JSON.stringify(response.data));
+            this.source_data = response.data;
             })
-            .catch(error => console.log(error));
-    }
+        .catch(error => console.log(error));
+  }
 }
 </script>
 

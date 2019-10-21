@@ -1,3 +1,3 @@
 export default {
-  base_uri: "http://192.168.2.119:3000/"
+  base_uri: "http://localhost:8080/"
 }
