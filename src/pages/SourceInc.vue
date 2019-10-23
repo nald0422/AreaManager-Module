@@ -9,35 +9,15 @@
       :visible-columns="visibleColumns"
     >
       <template v-slot:top="props">
-        <div class="col-2 q-table__title">Approved Applications</div>
+        <div class="col-2 q-table__title text-h6">Source of Income</div>
 
         <q-space />
-
-        <div v-if="$q.screen.gt.xs" class="col">
-          <q-toggle v-model="visibleColumns" val="userId" label="User Id" />
-          <q-toggle v-model="visibleColumns" val="id" label="ID" />
-          <q-toggle v-model="visibleColumns" val="title" label="Title" />
-          <q-toggle v-model="visibleColumns" val="body" label="Body" />
-        </div>
-        <q-select
-          v-else
-          v-model="visibleColumns"
-          multiple
-          borderless
-          dense
-          options-dense
-          :display-value="$q.lang.table.columns"
-          emit-value
-          map-options
-          :options="columns"
-          option-value="name"
-          style="min-width: 150px"
-        />
 
         <q-btn
           flat round dense
           icon="edit"
           class="q-ml-md"
+          @click="filters = true"
         />
 
         <q-btn
@@ -96,6 +76,26 @@
         </q-tr>
       </template>
     </q-table>
+
+    <q-dialog v-model="filters" :persistent="true">
+        <q-card style="width: 300px" class="q-px-sm q-pb-md">
+            <q-card-section>
+                <div class="text-h6">Filters</div>
+            </q-card-section>
+
+            <q-item dense>
+                <q-item-section>
+                    <q-checkbox keep-color v-model="visibleColumns" val="userId" label="Display User ID" />
+                    <q-checkbox keep-color v-model="visibleColumns" val="id" label="Display Application ID" />
+                    <q-checkbox keep-color v-model="visibleColumns" val="title" label="Display Title" />
+                    <q-checkbox keep-color v-model="visibleColumns" val="body" label="Display Body" />
+                </q-item-section>
+            </q-item>
+            <q-card-actions align="right" class="bg-white text-primary">
+                <q-btn flat label="Done" @click="filters=false" />
+            </q-card-actions>
+        </q-card>
+    </q-dialog>
   </div>
 </template>
 
@@ -103,43 +103,44 @@
 export default {
   data () {
     return {
-      visibleColumns: ['userId', 'id', 'title', 'body'],
-      columns: [
-        {
-            name: "userId",
-            align: "left",
-            label: "User Id",
-            field: "userId",
-            sortable: true
-        },
-        {
-            name: "id",
-            align: "left",
-            label: "ID",
-            field: "id",
-            sortable: true
-        },
-        {
-            name: "title",
-            align: "left",
-            label: "Title",
-            field: "title",
-            sortable: true
-        },
-        {
-            name: "body",
-            align: "left",
-            label: "Body",
-            field: "body",
-            sortable: true
-        },
-        { name: "action", align: "center", label: "Action" }
-      ],
-      source_list: [],
-      source_data: [],
-      amId: "",
-      dateFrom: "",
-      dateTo: ""
+        filters: false,
+        visibleColumns: ['userId', 'id', 'title', 'body'],
+        columns: [
+            {
+                name: "userId",
+                align: "left",
+                label: "User Id",
+                field: "userId",
+                sortable: true
+            },
+            {
+                name: "id",
+                align: "left",
+                label: "ID",
+                field: "id",
+                sortable: true
+            },
+            {
+                name: "title",
+                align: "left",
+                label: "Title",
+                field: "title",
+                sortable: true
+            },
+            {
+                name: "body",
+                align: "left",
+                label: "Body",
+                field: "body",
+                sortable: true
+            },
+            { name: "action", align: "center", label: "Action" }
+        ],
+        source_list: [],
+        source_data: [],
+        amId: "",
+        dateFrom: "",
+        dateTo: ""
     }
   },
 

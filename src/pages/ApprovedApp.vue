@@ -8,7 +8,7 @@
       :visible-columns="visibleColumns"
     >
       <template v-slot:top="props">
-        <div class="col-2 q-table__title">Approved Applications</div>
+        <div class="col-2 q-table__title text-h6">Approved Applications</div>
 
         <q-space />
 
