@@ -1,6 +1,6 @@
 <template>
   <q-layout view="hHh lpR fFf" class="bg-grey-1">
-    <q-header elevated class="bg-white text-grey-8" height-hint="64">
+    <q-header elevated class="bg-grey-10 text-grey-1" height-hint="64">
       <q-toolbar class="GNL__toolbar">
         <q-btn
           flat
@@ -22,10 +22,19 @@
             <q-avatar size="26px">
               <img src="https://cdn.quasar.dev/img/boy-avatar.png">
             </q-avatar>
-            <q-menu>
+            <q-menu fit anchor="bottom left" self="top left">
                 <q-list style="min-width: 100px">
-                    <q-item clickable v-close-popup @click="accountSettings_Modal = true">
-                        <q-item-section>Settings</q-item-section>
+                    <q-item clickable v-ripple active>
+                        <q-item-section avatar>
+                            <q-icon name = "trending_flat"></q-icon>
+                        </q-item-section>
+                        <q-item-section>Logout</q-item-section>
+                    </q-item>
+                    <q-item clickable v-ripple active @click="accountSettings_Modal=true">
+                        <q-item-section avatar>
+                            <q-icon name = "group"></q-icon>
+                        </q-item-section>
+                        <q-item-section>Management</q-item-section>
                     </q-item>
                 </q-list>
             </q-menu>
@@ -39,7 +48,7 @@
       v-model="leftDrawerOpen"
       show-if-above
       bordered
-      content-class="bg-white"
+      content-class="bg-grey-1"
       :width="280"
     >
       <q-scroll-area class="fit">
@@ -83,31 +92,44 @@
       </q-scroll-area>
     </q-drawer>
 
-    <q-dialog v-model="accountSettings_Modal">
+    <q-dialog v-model="accountSettings_Modal" :persistent="true">
         <q-card style="width: 700px; max-width: 80vw;">
-            <q-card-section>
-                <div class="text-h6">Settings</div>
+            <q-card-section class="bg-grey-10 text-grey-1">
+                <div class="text-h6">User Management</div>
             </q-card-section>
 
             <q-card-section>
                 <div class="fit row wrap justify-start items-start content-start">
-                    <div class="col-3 self-start">
-                        <q-list bordered padding class="rounded-borders text-primary">
-                            <q-item clickable v-ripple active>
-                                <q-item-section avatar>
-                                    <q-icon name = "account_box"></q-icon>
-                                </q-item-section>
-                                <q-item-section>Settings</q-item-section>
-                            </q-item>
-                        </q-list>
+                    <div class="col-4 self-start q-pt-xl q-px-lg">
+                        <q-option-group
+                            v-model="group"
+                            :options="options"
+                            color="red"
+                            left-label
+                            />
                     </div>
-                    <div class="col-grow self-start"></div>
+                        <div class="col-grow self-start">
+                            <div class="q-pa-md">
+                                <div class="q-gutter-sm">
+                                    <q-list dense padding class="rounded-borders">
+                                        <q-item clickable v-ripple v-for="branch in branches" :key="branch">
+                                            <q-item-section>
+                                                <q-checkbox v-model="selectedBranch" :val="branch" color="cyan" :label="branch" />
+                                            </q-item-section>
+                                        </q-item>
+                                    </q-list>
+                                </div>
+                            <div class="q-px-sm">
+                            The model data: <strong>{{ selectedBranch }}</strong>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                
             </q-card-section>
 
-            <q-card-actions align="right" class="bg-white text-teal">
-                <q-btn flat label="OK" />
+            <q-card-actions align="right">
+                <q-btn flat label="Done" color="primary" @click="accountSettings_Modal=false" />
+                <q-btn flat label="Save" color="positive" />
             </q-card-actions>
         </q-card>
     </q-dialog>
@@ -138,6 +160,43 @@
                             </template>
                         </q-input>
                     </div>
+                    <div class="col-3 offset-1 self-start q-pa-md" v-show="soi_status">
+                        <q-btn-dropdown
+                            color="cyan"
+                            push
+                            no-caps
+                            @click="onMainClick"
+                            transition="slide-right"
+                        >
+                            <template v-slot:label>
+                                <div class="row items-center no-wrap">
+                                    <q-icon left name="money" />
+                                    <div class="text-center">
+                                        {{dropdown_label}}
+                                    </div>
+                                </div>
+                            </template>
+
+                            <q-list>
+                                <q-item clickable v-close-popup @click="onItemClick('Self Employed')">
+                                    <q-item-section avatar>
+                                        <q-avatar icon="work" color="red" text-color="white" />
+                                    </q-item-section>
+                                    <q-item-section>
+                                        <q-item-label>Self employed</q-item-label>
+                                    </q-item-section>
+                                </q-item>
+                                <q-item clickable v-close-popup @click="onItemClick('Business')">
+                                    <q-item-section avatar>
+                                        <q-avatar icon="business" color="red" text-color="white" />
+                                    </q-item-section>
+                                    <q-item-section>
+                                        <q-item-label>Business</q-item-label>
+                                    </q-item-section>
+                                </q-item>
+                            </q-list>
+                        </q-btn-dropdown>
+                    </div>
                 </div>
             </div>
         </div>
@@ -150,50 +209,109 @@
 
 import { date } from 'quasar'
 
+import account_comp from '../components/Account.vue'
+import admin_comp from '../components/Admin.vue'
+
+
 export default {
-  data () {
-    return {
-      leftDrawerOpen: false,
-      search: '',
-      showAdvanced: false,
-      showDateOptions: false,
-      accountSettings_Modal: false,
-      exactPhrase: '',
-      hasWords: '',
-      startingDate: date.formatDate(Date.now(), 'YYYY-MM-DDTHH:mm:ss.SSSZ'),
-      endingDate: date.formatDate(Date.now(), 'YYYY-MM-DDTHH:mm:ss.SSSZ'),
-      starting_calendar: false,
-      ending_calendar: false,
-      excludeWords: '',
-      byWebsite: '',
-      byDate: 'Any time',
-      links1: [
-        { icon: 'check', text: 'Appproved Applications', route: '/approvedApp' },
-        { icon: 'group_work', text: 'Applications by Age', route: '/appByAge' },
-        { icon: 'attach_money', text: 'Source of Income', route: '/sourceIncome' },
-      ],
-    }
-  },
-  methods: {
-    onClear () {
-      this.exactPhrase = ''
-      this.hasWords = ''
-      this.excludeWords = ''
-      this.byWebsite = ''
-      this.byDate = 'Any time'
+    components: {
+        account_comp,
+        admin_comp
     },
-    changeDate (option) {
-      this.byDate = option
-      this.showDateOptions = false
+
+
+    data () {
+        return {
+            leftDrawerOpen: false,
+            search: '',
+            showAdvanced: false,
+            showDateOptions: false,
+            accountSettings_Modal: false,
+            exactPhrase: '',
+            hasWords: '',
+            startingDate: date.formatDate(Date.now(), 'YYYY-MM-DDTHH:mm:ss.SSSZ'),
+            endingDate: date.formatDate(Date.now(), 'YYYY-MM-DDTHH:mm:ss.SSSZ'),
+            starting_calendar: false,
+            ending_calendar: false,
+            excludeWords: '',
+            byWebsite: '',
+            byDate: 'Any time',
+            links1: [
+                { icon: 'check', text: 'Appproved Applications', route: '/approvedApp' },
+                { icon: 'group_work', text: 'Applications by Age', route: '/appByAge' },
+                { icon: 'attach_money', text: 'Source of Income', route: '/sourceIncome' },
+            ],
+
+            dropdown_label: 'Source of Income',
+            selectedComponent: 'account_comp',
+            selectedManager: [],   // Area managers
+            selectedBranch: [],  // Branches checkbox
+            group: 'op1',
+            columns: [
+                {
+                    name: 'Name',
+                    required: true,
+                    align: 'left',
+                    field: row => row.name,
+                    format: val => `${val}`,
+                    sortable: true
+                }
+            ],
+            options: [
+                {
+                label: 'Area Manager A',
+                value: 'op1'
+                },
+                {
+                label: 'Area Manager B',
+                value: 'op2'
+                },
+                {
+                label: 'Area Manager C',
+                value: 'op3'
+                }
+            ],
+            branches: ['Antipas', 'Aurora', 'Butuan', 'Buug', 'Banga']
+
+        }
     },
-    closeDialog(calendar) {
-        if(calendar === this.starting_calendar) {
-            this.starting_calendar = false
-        } else if (calendar === this.ending_calendar) {
-            this.ending_calendar = false
+
+    methods: {
+        onClear () {
+        this.exactPhrase = ''
+        this.hasWords = ''
+        this.excludeWords = ''
+        this.byWebsite = ''
+        this.byDate = 'Any time'
+        },
+
+        changeDate (option) {
+        this.byDate = option
+        this.showDateOptions = false
+        },
+
+        closeDialog(calendar) {
+            if(calendar === this.starting_calendar) {
+                this.starting_calendar = false
+            } else if (calendar === this.ending_calendar) {
+                this.ending_calendar = false
+            }
+        },
+        
+        onMainClick() {
+
+        },
+
+        onItemClick(item) {
+            this.dropdown_label = item
+        }
+    },
+
+    computed: {
+        soi_status() {
+            return this.$store.state.components.soi_comp
         }
     }
-  }
 }
 </script>
 

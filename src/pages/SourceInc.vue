@@ -16,6 +16,7 @@
         <q-btn
           flat round dense
           icon="edit"
+          color="accent"
           class="q-ml-md"
           @click="filters = true"
         />
@@ -23,6 +24,7 @@
         <q-btn
           flat round dense
           icon="print"
+          color="primary"
           class="q-ml-md"
         />
 
@@ -78,12 +80,12 @@
     </q-table>
 
     <q-dialog v-model="filters" :persistent="true">
-        <q-card style="width: 300px" class="q-px-sm q-pb-md">
-            <q-card-section>
+        <q-card style="width: 300px" class="q-pb-md">
+            <q-card-section class="bg-grey-10 text-grey-1">
                 <div class="text-h6">Filters</div>
             </q-card-section>
 
-            <q-item dense>
+            <q-item dense class="q-pt-md">
                 <q-item-section>
                     <q-checkbox keep-color v-model="visibleColumns" val="userId" label="Display User ID" />
                     <q-checkbox keep-color v-model="visibleColumns" val="id" label="Display Application ID" />
@@ -104,6 +106,8 @@ export default {
   data () {
     return {
         filters: false,
+        rows: 10,
+        loading: false,
         visibleColumns: ['userId', 'id', 'title', 'body'],
         columns: [
             {
@@ -144,10 +148,10 @@ export default {
     }
   },
 
-  computed: {
+    computed: {
         baseUri() {
-            return this.$store.state.util.base_uri;
-        }
+            return this.$store.state.util.base_uri
+        },
     },
 
     method: {
@@ -158,18 +162,26 @@ export default {
                 .then(response => {
                     this.source_data = response["date"]
                 })
-                .catch(error => console.log(error));
+                .catch(error => console.log(error))
         }
     },
 
     created() {
+        this.loading = true;
         this.$axios
         .get("https://jsonplaceholder.typicode.com/posts")
         .then(response => {
             // console.log(JSON.stringify(response.data));
-            this.source_data = response.data;
-            })
-        .catch(error => console.log(error));
+            this.source_data = response.data
+            this.loading = false;
+        })
+        .catch(error => console.log(error))
+
+        this.$store.dispatch('components/dispatch_soi_mutation', {status: true})
+  },
+
+  beforeDestroy() {
+      this.$store.dispatch('components/dispatch_soi_mutation', {status: false})
   }
 }
 </script>

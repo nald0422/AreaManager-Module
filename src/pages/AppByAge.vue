@@ -2,38 +2,30 @@
     <div class="q-pa-md">
     <q-table
       title="Treats"
-      :data="data"
+      :data="source_data"
       :columns="columns"
-      row-key="name"
+      row-key="id"
+      :loading="loading"
       :visible-columns="visibleColumns"
     >
       <template v-slot:top="props">
-        <div class="col-2 q-table__title text-h6">Applications By Age</div>
+        <div class="col-3 q-table__title text-h6">Applications by Age</div>
 
         <q-space />
 
-        <div v-if="$q.screen.gt.xs" class="col">
-          <q-toggle v-model="visibleColumns" val="calories" label="Calories" />
-          <q-toggle v-model="visibleColumns" val="fat" label="Fat" />
-          <q-toggle v-model="visibleColumns" val="carbs" label="Carbs" />
-          <q-toggle v-model="visibleColumns" val="protein" label="Protein" />
-          <q-toggle v-model="visibleColumns" val="sodium" label="Sodium" />
-          <q-toggle v-model="visibleColumns" val="calcium" label="Calcium" />
-          <q-toggle v-model="visibleColumns" val="iron" label="Iron" />
-        </div>
-        <q-select
-          v-else
-          v-model="visibleColumns"
-          multiple
-          borderless
-          dense
-          options-dense
-          :display-value="$q.lang.table.columns"
-          emit-value
-          map-options
-          :options="columns"
-          option-value="name"
-          style="min-width: 150px"
+        <q-btn
+          flat round dense
+          icon="edit"
+          color="accent"
+          class="q-ml-md"
+          @click="filters = true"
+        />
+
+        <q-btn
+          flat round dense
+          icon="print"
+          color="primary"
+          class="q-ml-md"
         />
 
         <q-btn
@@ -43,158 +35,200 @@
           class="q-ml-md"
         />
       </template>
+
+      <template v-slot:body="props">
+        <q-tr :props="props">
+            <q-td key="action" :props="props" class="q-gutter-xs" style="min-width: 140px;">
+                <q-btn
+                    color="accent"
+                    class="btn-action"
+                    icon="visibility"
+                    size="sm"
+                    @click="age_table=true"
+                />
+            </q-td>
+            <q-td key="userId" :props="props">{{ props.row.userId }}</q-td>
+            <q-td key="id" :props="props">{{ props.row.id }}</q-td>
+            <q-td key="title" class="text-ellipsis" :props="props">
+                {{ props.row.title }}
+                <q-popup-edit v-model="props.row.title">
+                    <span>{{ props.row.title }}</span>
+                </q-popup-edit>
+            </q-td>
+            <q-td key="body" class="text-ellipsis" :props="props">
+                {{ props.row.body }}
+                <q-popup-edit v-model="props.row.body">
+                    <span>{{ props.row.body }}</span>
+                </q-popup-edit>
+            </q-td>
+        </q-tr>
+      </template>
     </q-table>
+
+    <q-dialog v-model="filters" :persistent="true">
+        <q-card style="width: 300px" class="q-px-sm q-pb-md">
+            <q-card-section>
+                <div class="text-h6">Filters</div>
+            </q-card-section>
+
+            <q-item dense>
+                <q-item-section>
+                    <q-checkbox keep-color v-model="visibleColumns" val="userId" label="Display User ID" />
+                    <q-checkbox keep-color v-model="visibleColumns" val="id" label="Display Application ID" />
+                    <q-checkbox keep-color v-model="visibleColumns" val="title" label="Display Title" />
+                    <q-checkbox keep-color v-model="visibleColumns" val="body" label="Display Body" />
+                </q-item-section>
+            </q-item>
+            <q-card-actions align="right" class="bg-white text-primary">
+                <q-btn flat label="Done" @click="filters=false" />
+            </q-card-actions>
+        </q-card>
+    </q-dialog>
+
+    <q-dialog full-width v-model="age_table" :persistent="false">
+        <q-card style="width: 600px" class="q-px-sm q-pb-md">
+            <q-card-section>
+                <q-table
+                title="Treats"
+                :data="source_data"
+                :columns="columns"
+                row-key="id"
+                :loading="loading"
+                :visible-columns="visibleColumns"
+                >
+                    <template v-slot:top="props">
+                        <div class="col-3 q-table__title text-h6">Applications by Age</div>
+
+                        <q-space />
+
+                        <q-btn
+                        flat round dense
+                        icon="edit"
+                        color="accent"
+                        class="q-ml-md"
+                        @click="filters = true"
+                        />
+
+                        <q-btn
+                        flat round dense
+                        icon="print"
+                        color="primary"
+                        class="q-ml-md"
+                        />
+
+                        <q-btn
+                        flat round dense
+                        :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+                        @click="props.toggleFullscreen"
+                        class="q-ml-md"
+                        />
+                    </template>
+
+                    <template v-slot:body="props">
+                        <q-tr :props="props">
+                            <q-td key="userId" :props="props">{{ props.row.userId }}</q-td>
+                            <q-td key="id" :props="props">{{ props.row.id }}</q-td>
+                            <q-td key="title" class="text-ellipsis" :props="props">
+                                {{ props.row.title }}
+                                <q-popup-edit v-model="props.row.title">
+                                    <span>{{ props.row.title }}</span>
+                                </q-popup-edit>
+                            </q-td>
+                            <q-td key="body" class="text-ellipsis" :props="props">
+                                {{ props.row.body }}
+                                <q-popup-edit v-model="props.row.body">
+                                    <span>{{ props.row.body }}</span>
+                                </q-popup-edit>
+                            </q-td>
+                        </q-tr>
+                    </template>
+                </q-table>
+            </q-card-section>
+            <q-card-actions align="right" class="bg-white text-primary">
+                <q-btn flat label="Done" @click="age_table=false" />
+            </q-card-actions>
+        </q-card>
+    </q-dialog>
   </div>
 </template>
 
 <script>
-
 export default {
   data () {
     return {
-      visibleColumns: ['calories', 'desc', 'fat', 'carbs', 'protein', 'sodium', 'calcium', 'iron'],
-      columns: [
-        {
-          name: 'desc',
-          required: true,
-          label: 'Dessert (100g serving)',
-          align: 'left',
-          field: row => row.name,
-          format: val => `${val}`,
-          sortable: true
-        },
-        { name: 'calories', align: 'center', label: 'Calories', field: 'calories', sortable: true },
-        { name: 'fat', label: 'Fat (g)', field: 'fat', sortable: true },
-        { name: 'carbs', label: 'Carbs (g)', field: 'carbs' },
-        { name: 'protein', label: 'Protein (g)', field: 'protein' },
-        { name: 'sodium', label: 'Sodium (mg)', field: 'sodium' },
-        { name: 'calcium', label: 'Calcium (%)', field: 'calcium', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) },
-        { name: 'iron', label: 'Iron (%)', field: 'iron', sortable: true, sort: (a, b) => parseInt(a, 10) - parseInt(b, 10) }
-      ],
-      data: [
-        {
-          name: 'Frozen Yogurt',
-          calories: 159,
-          fat: 6.0,
-          carbs: 24,
-          protein: 4.0,
-          sodium: 87,
-          calcium: '14%',
-          iron: '1%'
-        },
-        {
-          name: 'Ice cream sandwich',
-          calories: 237,
-          fat: 9.0,
-          carbs: 37,
-          protein: 4.3,
-          sodium: 129,
-          calcium: '8%',
-          iron: '1%'
-        },
-        {
-          name: 'Eclair',
-          calories: 262,
-          fat: 16.0,
-          carbs: 23,
-          protein: 6.0,
-          sodium: 337,
-          calcium: '6%',
-          iron: '7%'
-        },
-        {
-          name: 'Cupcake',
-          calories: 305,
-          fat: 3.7,
-          carbs: 67,
-          protein: 4.3,
-          sodium: 413,
-          calcium: '3%',
-          iron: '8%'
-        },
-        {
-          name: 'Gingerbread',
-          calories: 356,
-          fat: 16.0,
-          carbs: 49,
-          protein: 3.9,
-          sodium: 327,
-          calcium: '7%',
-          iron: '16%'
-        },
-        {
-          name: 'Jelly bean',
-          calories: 375,
-          fat: 0.0,
-          carbs: 94,
-          protein: 0.0,
-          sodium: 50,
-          calcium: '0%',
-          iron: '0%'
-        },
-        {
-          name: 'Lollipop',
-          calories: 392,
-          fat: 0.2,
-          carbs: 98,
-          protein: 0,
-          sodium: 38,
-          calcium: '0%',
-          iron: '2%'
-        },
-        {
-          name: 'Honeycomb',
-          calories: 408,
-          fat: 3.2,
-          carbs: 87,
-          protein: 6.5,
-          sodium: 562,
-          calcium: '0%',
-          iron: '45%'
-        },
-        {
-          name: 'Donut',
-          calories: 452,
-          fat: 25.0,
-          carbs: 51,
-          protein: 4.9,
-          sodium: 326,
-          calcium: '2%',
-          iron: '22%'
-        },
-        {
-          name: 'KitKat',
-          calories: 518,
-          fat: 26.0,
-          carbs: 65,
-          protein: 7,
-          sodium: 54,
-          calcium: '12%',
-          iron: '6%'
-        }
-      ],
-      dateFrom: "2019-01-01",
-      dateTo: "2019-03-29",
-      amId: "2019000002",
+        filters: false,
+        age_table: false,
+        rows: 10,
+        loading: false,
+        visibleColumns: ['action', 'userId', 'id', 'title', 'body'],
+        columns: [
+            { name: "action", align: "center", label: "Action" },
+            {
+                name: "userId",
+                align: "left",
+                label: "User Id",
+                field: "userId",
+                sortable: true
+            },
+            {
+                name: "id",
+                align: "left",
+                label: "ID",
+                field: "id",
+                sortable: true
+            },
+            {
+                name: "title",
+                align: "left",
+                label: "Title",
+                field: "title",
+                sortable: true
+            },
+            {
+                name: "body",
+                align: "left",
+                label: "Body",
+                field: "body",
+                sortable: true
+            },
+        ],
+        source_list: [],
+        source_data: [],
+        amId: "",
+        dateFrom: "",
+        dateTo: ""
     }
   },
 
     computed: {
         baseUri() {
-            return this.$store.state.util.base_uri;
+            return this.$store.state.util.base_uri
+        },
+    },
+
+    method: {
+        getSourceOfIncome(income) {
+            var url = this.baseUri.concat(income+"/"+amId+"/"+dateFrom+"/"+dateTo)
+                this.$axios
+                .get(url)
+                .then(response => {
+                    this.source_data = response["date"]
+                })
+                .catch(error => console.log(error))
         }
     },
 
     created() {
-            var url = this.baseUri.concat("areamanager/query/age/"+this.amId+"/"+this.dateFrom+"/"+this.dateTo);
-
-            this.$axios
-            .get(url)
-            .then(response => {
-                this.approvedApp_data = response["data"]
-            })
-            .catch(error => console.log(error));
-    }
+        this.loading = true
+        this.$axios
+        .get("https://jsonplaceholder.typicode.com/posts")
+        .then(response => {
+            // console.log(JSON.stringify(response.data));
+            this.source_data = response.data
+            this.loading = false
+        })
+        .catch(error => console.log(error))
+  },
 }
 </script>
 

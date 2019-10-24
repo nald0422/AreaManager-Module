@@ -2,44 +2,29 @@
     <div class="q-pa-md">
     <q-table
       title="Treats"
-      :data="approvedApp_data"
+      :data="source_data"
       :columns="columns"
-      row-key="name"
+      row-key="id"
+      :loading="loading"
       :visible-columns="visibleColumns"
     >
       <template v-slot:top="props">
-        <div class="col-2 q-table__title text-h6">Approved Applications</div>
+        <div class="col-3 q-table__title text-h6">Approved Applications</div>
 
         <q-space />
 
-        <div v-if="$q.screen.gt.xs" class="col">
-          <q-toggle v-model="visibleColumns" val="calories" label="Calories" />
-          <q-toggle v-model="visibleColumns" val="fat" label="Fat" />
-          <q-toggle v-model="visibleColumns" val="carbs" label="Carbs" />
-          <q-toggle v-model="visibleColumns" val="protein" label="Protein" />
-          <q-toggle v-model="visibleColumns" val="sodium" label="Sodium" />
-          <q-toggle v-model="visibleColumns" val="calcium" label="Calcium" />
-          <q-toggle v-model="visibleColumns" val="iron" label="Iron" />
-        </div>
-        <q-select
-          v-else
-          v-model="visibleColumns"
-          multiple
-          borderless
-          dense
-          options-dense
-          :display-value="$q.lang.table.columns"
-          emit-value
-          map-options
-          :options="columns"
-          option-value="name"
-          style="min-width: 150px"
+        <q-btn
+          flat round dense
+          icon="edit"
+          color="accent"
+          class="q-ml-md"
+          @click="filters = true"
         />
 
         <q-btn
           flat round dense
           icon="print"
-          @click="props.toggleFullscreen"
+          color="primary"
           class="q-ml-md"
         />
 
@@ -53,8 +38,8 @@
 
       <template v-slot:body="props">
         <q-tr :props="props">
-          <q-td key="id" :props="props">{{ props.row.userId }}</q-td>
-          <q-td key="name" :props="props">{{ props.row.id }}</q-td>
+          <q-td key="userId" :props="props">{{ props.row.userId }}</q-td>
+          <q-td key="id" :props="props">{{ props.row.id }}</q-td>
           <q-td key="title" class="text-ellipsis" :props="props">
             {{ props.row.title }}
             <q-popup-edit v-model="props.row.title">
@@ -92,71 +77,109 @@
           </q-td>
         </q-tr>
       </template>
-
     </q-table>
+
+    <q-dialog v-model="filters" :persistent="true">
+        <q-card style="width: 300px" class="q-px-sm q-pb-md">
+            <q-card-section>
+                <div class="text-h6">Filters</div>
+            </q-card-section>
+
+            <q-item dense>
+                <q-item-section>
+                    <q-checkbox keep-color v-model="visibleColumns" val="userId" label="Display User ID" />
+                    <q-checkbox keep-color v-model="visibleColumns" val="id" label="Display Application ID" />
+                    <q-checkbox keep-color v-model="visibleColumns" val="title" label="Display Title" />
+                    <q-checkbox keep-color v-model="visibleColumns" val="body" label="Display Body" />
+                </q-item-section>
+            </q-item>
+            <q-card-actions align="right" class="bg-white text-primary">
+                <q-btn flat label="Done" @click="filters=false" />
+            </q-card-actions>
+        </q-card>
+    </q-dialog>
   </div>
 </template>
 
 <script>
-
 export default {
   data () {
     return {
-        visibleColumns: ['personId', 'personName', 'personAge'],
-        filter: '',
-        approvedApp_data: [],
+        filters: false,
+        rows: 10,
+        loading: false,
+        visibleColumns: ['userId', 'id', 'title', 'body'],
         columns: [
             {
-                name: "personId",
+                name: "userId",
                 align: "left",
-                label: "PERSON ID",
-                field: "personId",
+                label: "User Id",
+                field: "userId",
                 sortable: true
             },
             {
-                name: "personName",
+                name: "id",
                 align: "left",
-                label: "PERSON NAME",
-                field: "personName",
+                label: "ID",
+                field: "id",
                 sortable: true
             },
             {
-                name: "personAge",
+                name: "title",
                 align: "left",
-                label: "PERSON AGE",
-                field: "personAge",
+                label: "Title",
+                field: "title",
                 sortable: true
-            }
+            },
+            {
+                name: "body",
+                align: "left",
+                label: "Body",
+                field: "body",
+                sortable: true
+            },
+            { name: "action", align: "center", label: "Action" }
         ],
-        data: [],
-        dateFrom: "2019-01-01",
-        dateTo: "2019-03-29",
-        amId: "2019000002",
+        source_list: [],
+        source_data: [],
+        amId: "",
+        dateFrom: "",
+        dateTo: ""
     }
   },
-    
+
+    computed: {
+        baseUri() {
+            return this.$store.state.util.base_uri;
+        },
+    },
+
+    method: {
+        getSourceOfIncome(income) {
+            var url = this.baseUri.concat(income+"/"+amId+"/"+dateFrom+"/"+dateTo);
+                this.$axios
+                .get(url)
+                .then(response => {
+                    this.source_data = response["date"]
+                })
+                .catch(error => console.log(error))
+        }
+    },
+
     created() {
-    this.$axios
-      .get("https://jsonplaceholder.typicode.com/posts")
-      .then(response => {
-        console.log(JSON.stringify(response));
-        this.data = response["data"];
-      })
-      .catch(error => console.log(error));
-
-        console.log("approved app data length : " + this.data.length)
+        this.loading = true
+        this.$axios
+        .get("https://jsonplaceholder.typicode.com/posts")
+        .then(response => {
+            // console.log(JSON.stringify(response.data));
+            this.source_data = response.data
+            this.loading = false
+        })
+        .catch(error => console.log(error))
   },
-
-//   computed: {
-//       baseUri() {
-//           return this.$store.state.util.base_uri.concat("Persons");
-//       }
-//   },
-
-  
 }
 </script>
 
-<style scoped lang="sass">
+<style scoped>
 
 </style>
