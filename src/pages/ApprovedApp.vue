@@ -6,7 +6,9 @@
       :columns="columns"
       row-key="id"
       :loading="loading"
+      dense
       :visible-columns="visibleColumns"
+      :pagination.sync="pagination"
     >
       <template v-slot:top="props">
         <div class="col-3 q-table__title text-h6">Approved Applications</div>
@@ -16,7 +18,7 @@
         <q-btn
           flat round dense
           icon="edit"
-          color="accent"
+          color="indigo"
           class="q-ml-md"
           @click="filters = true"
         />
@@ -80,12 +82,12 @@
     </q-table>
 
     <q-dialog v-model="filters" :persistent="true">
-        <q-card style="width: 300px" class="q-px-sm q-pb-md">
-            <q-card-section>
+        <q-card style="width: 300px" class="q-pb-md">
+            <q-card-section class="bg-grey-10 text-grey-1">
                 <div class="text-h6">Filters</div>
             </q-card-section>
 
-            <q-item dense>
+            <q-item dense class="q-pt-md">
                 <q-item-section>
                     <q-checkbox keep-color v-model="visibleColumns" val="userId" label="Display User ID" />
                     <q-checkbox keep-color v-model="visibleColumns" val="id" label="Display Application ID" />
@@ -109,6 +111,9 @@ export default {
         rows: 10,
         loading: false,
         visibleColumns: ['userId', 'id', 'title', 'body'],
+        pagination: {
+            rowsPerPage: 10
+        },
         columns: [
             {
                 name: "userId",

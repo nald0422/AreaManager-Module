@@ -48,11 +48,11 @@
       v-model="leftDrawerOpen"
       show-if-above
       bordered
-      content-class="bg-grey-1"
+      content-class="bg-grey-10"
       :width="280"
     >
       <q-scroll-area class="fit">
-        <q-list padding class="text-grey-8">
+        <q-list padding>
             <q-expansion-item
                 expand-seperator
                 icon="file_copy"
@@ -63,10 +63,10 @@
             >
             <q-item class="GNL__drawer-item" :to="link.route" v-ripple clickable v-for="link in links1" :key="link.text" active-class="my-menu-link">
                 <q-item-section avatar>
-                    <q-icon :name="link.icon" />
+                    <q-icon :color="link.color" :name="link.icon" />
                 </q-item-section>
                 <q-item-section>
-                    <q-item-label>{{link.text}}</q-item-label>
+                    <q-item-label class="text-grey-1">{{link.text}}</q-item-label>
                 </q-item-section>
             </q-item>
             </q-expansion-item>
@@ -100,36 +100,61 @@
 
             <q-card-section>
                 <div class="fit row wrap justify-start items-start content-start">
-                    <div class="col-4 self-start q-pt-xl q-px-lg">
-                        <q-option-group
-                            v-model="group"
-                            :options="options"
-                            color="red"
-                            left-label
-                            />
+                    <div class="col-4 self-start q-pt-lg q-px-sm">
+                        <label class="text-h6">Area Managers</label>
+                        <hr>
+                        <div class="q-pt-md q-px-sm">
+                            <q-option-group
+                                id="optionGroup"
+                                v-model="group"
+                                :options="options"
+                                color="red"
+                                left-label
+                                />
+                        </div>
                     </div>
-                        <div class="col-grow self-start">
-                            <div class="q-pa-md">
-                                <div class="q-gutter-sm">
-                                    <q-list dense padding class="rounded-borders">
-                                        <q-item clickable v-ripple v-for="branch in branches" :key="branch">
-                                            <q-item-section>
-                                                <q-checkbox v-model="selectedBranch" :val="branch" color="cyan" :label="branch" />
-                                            </q-item-section>
-                                        </q-item>
-                                    </q-list>
-                                </div>
-                            <div class="q-px-sm">
+                    <div class="col-grow self-start q-pt-lg q-px-sm">
+                        <label class="text-h6">Branches</label>
+                        <q-btn size="md" dense color="indigo" icon="add" style="float: right" @click="assignBranches_modal=true"/>
+                        <hr>
+                        <q-list dense padding class="rounded-borders">
+                            <q-item clickable v-ripple v-for="branch in branches" :key="branch">
+                                <q-item-section>
+                                    <q-checkbox v-model="selectedBranch" :val="branch" color="cyan" :label="branch" />
+                                </q-item-section>
+                            </q-item>
+                        </q-list>
+                        <div class="q-px-sm">
                             The model data: <strong>{{ selectedBranch }}</strong>
-                            </div>
                         </div>
                     </div>
                 </div>
             </q-card-section>
 
             <q-card-actions align="right">
-                <q-btn flat label="Done" color="primary" @click="accountSettings_Modal=false" />
-                <q-btn flat label="Save" color="positive" />
+                <q-btn flat label="Done" color="blue-10" @click="accountSettings_Modal=false" />
+                <q-btn flat label="Apply" color="green-10" />
+            </q-card-actions>
+        </q-card>
+    </q-dialog>
+
+    <q-dialog v-model="assignBranches_modal" :persistent="true">
+        <q-card style="width: 300px; max-width: 80vw;">
+            <q-card-section class="bg-grey-10 text-grey-1">
+                <div class="text-h6">Branch Assignment</div>
+            </q-card-section>
+            <q-card-section>
+            <q-list dense padding class="rounded-borders">
+                <q-item clickable v-ripple v-for="branch in branches" :key="branch">
+                    <q-item-section>
+                        <q-checkbox v-model="selectedBranch" :val="branch" color="cyan" :label="branch" />
+                    </q-item-section>
+                </q-item>
+            </q-list>
+            </q-card-section>
+            <q-card-actions align="right">
+                <q-btn flat label="Cancel" color="deep-orange-14" @click="assignBranches_modal=false" />
+                <q-btn flat label="Assign" color="green-10" />
             </q-card-actions>
         </q-card>
     </q-dialog>
@@ -162,7 +187,7 @@
                     </div>
                     <div class="col-3 offset-1 self-start q-pa-md" v-show="soi_status">
                         <q-btn-dropdown
-                            color="cyan"
+                            color="grey-10"
                             push
                             no-caps
                             @click="onMainClick"
@@ -170,7 +195,7 @@
                         >
                             <template v-slot:label>
                                 <div class="row items-center no-wrap">
-                                    <q-icon left name="money" />
+                                    <q-icon color="yellow-8" left :name="dropdown_icon" />
                                     <div class="text-center">
                                         {{dropdown_label}}
                                     </div>
@@ -178,17 +203,17 @@
                             </template>
 
                             <q-list>
-                                <q-item clickable v-close-popup @click="onItemClick('Self Employed')">
+                                <q-item clickable v-close-popup @click="onItemClick('Self Employed', 'work')">
                                     <q-item-section avatar>
-                                        <q-avatar icon="work" color="red" text-color="white" />
+                                        <q-avatar icon="work" color="cyan-10" text-color="white" />
                                     </q-item-section>
                                     <q-item-section>
                                         <q-item-label>Self employed</q-item-label>
                                     </q-item-section>
                                 </q-item>
-                                <q-item clickable v-close-popup @click="onItemClick('Business')">
+                                <q-item clickable v-close-popup @click="onItemClick('Business', 'business')">
                                     <q-item-section avatar>
-                                        <q-avatar icon="business" color="red" text-color="white" />
+                                        <q-avatar icon="business" color="cyan-10" text-color="white" />
                                     </q-item-section>
                                     <q-item-section>
                                         <q-item-label>Business</q-item-label>
@@ -227,22 +252,24 @@ export default {
             showAdvanced: false,
             showDateOptions: false,
             accountSettings_Modal: false,
+            assignBranches_modal: false,
             exactPhrase: '',
             hasWords: '',
-            startingDate: date.formatDate(Date.now(), 'YYYY-MM-DDTHH:mm:ss.SSSZ'),
-            endingDate: date.formatDate(Date.now(), 'YYYY-MM-DDTHH:mm:ss.SSSZ'),
+            startingDate: date.formatDate(Date.now(), 'YYYY-MM-DD'),
+            endingDate: date.formatDate(Date.now(), 'YYYY-MM-DD'),
             starting_calendar: false,
             ending_calendar: false,
             excludeWords: '',
             byWebsite: '',
             byDate: 'Any time',
             links1: [
-                { icon: 'check', text: 'Appproved Applications', route: '/approvedApp' },
-                { icon: 'group_work', text: 'Applications by Age', route: '/appByAge' },
-                { icon: 'attach_money', text: 'Source of Income', route: '/sourceIncome' },
+                { icon: 'check', text: 'Appproved Applications', color: 'yellow', route: '/approvedApp' },
+                { icon: 'group_work', text: 'Applications by Age', color: 'light-blue', route: '/appByAge' },
+                { icon: 'attach_money', text: 'Source of Income', color: 'green-14', route: '/sourceIncome' },
             ],
 
             dropdown_label: 'Source of Income',
+            dropdown_icon: 'money',
             selectedComponent: 'account_comp',
             selectedManager: [],   // Area managers
             selectedBranch: [],  // Branches checkbox
@@ -302,8 +329,9 @@ export default {
 
         },
 
-        onItemClick(item) {
+        onItemClick(item, icon) {
             this.dropdown_label = item
+            this.dropdown_icon = icon
         }
     },
 
@@ -345,7 +373,7 @@ export default {
 .EXP
     &__expansionItem
         font-weight: 500
-        color: #2F3538
+        color: white
 
 .SEARCH
     &__container
@@ -358,5 +386,4 @@ export default {
 
 .my-menu-link
   color: white
-  background: #F2C037
 </style>

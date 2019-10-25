@@ -4,9 +4,11 @@
       title="Treats"
       :data="source_data"
       :columns="columns"
+      dense
       row-key="id"
       :loading="loading"
       :visible-columns="visibleColumns"
+      :pagination.sync="pagination"
     >
       <template v-slot:top="props">
         <div class="col-3 q-table__title text-h6">Applications by Age</div>
@@ -16,7 +18,7 @@
         <q-btn
           flat round dense
           icon="edit"
-          color="accent"
+          color="indigo"
           class="q-ml-md"
           @click="filters = true"
         />
@@ -40,10 +42,11 @@
         <q-tr :props="props">
             <q-td key="action" :props="props" class="q-gutter-xs" style="min-width: 140px;">
                 <q-btn
-                    color="accent"
+                    color="blue-10"
                     class="btn-action"
                     icon="visibility"
-                    size="sm"
+                    dense
+                    size="12px"
                     @click="age_table=true"
                 />
             </q-td>
@@ -66,12 +69,12 @@
     </q-table>
 
     <q-dialog v-model="filters" :persistent="true">
-        <q-card style="width: 300px" class="q-px-sm q-pb-md">
-            <q-card-section>
+        <q-card style="width: 300px" class="q-pb-md">
+            <q-card-section class="bg-grey-10 text-grey-1">
                 <div class="text-h6">Filters</div>
             </q-card-section>
 
-            <q-item dense>
+            <q-item dense class="q-pt-md">
                 <q-item-section>
                     <q-checkbox keep-color v-model="visibleColumns" val="userId" label="Display User ID" />
                     <q-checkbox keep-color v-model="visibleColumns" val="id" label="Display Application ID" />
@@ -160,6 +163,9 @@ export default {
         age_table: false,
         rows: 10,
         loading: false,
+        pagination: {
+            rowsPerPage: 10
+        },
         visibleColumns: ['action', 'userId', 'id', 'title', 'body'],
         columns: [
             { name: "action", align: "center", label: "Action" },

@@ -2,11 +2,13 @@
     <div class="q-pa-md">
     <q-table
       title="Treats"
+      dense
       :data="source_data"
       :columns="columns"
       row-key="id"
       :loading="loading"
       :visible-columns="visibleColumns"
+      :pagination.sync="pagination"
     >
       <template v-slot:top="props">
         <div class="col-2 q-table__title text-h6">Source of Income</div>
@@ -16,7 +18,7 @@
         <q-btn
           flat round dense
           icon="edit"
-          color="accent"
+          color="indigo"
           class="q-ml-md"
           @click="filters = true"
         />
@@ -109,6 +111,9 @@ export default {
         rows: 10,
         loading: false,
         visibleColumns: ['userId', 'id', 'title', 'body'],
+        pagination: {
+            rowsPerPage: 10
+        },
         columns: [
             {
                 name: "userId",
