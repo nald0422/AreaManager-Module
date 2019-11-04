@@ -24,11 +24,40 @@
         />
 
         <q-btn
-          flat round dense
-          icon="print"
-          color="primary"
-          class="q-ml-md"
-        />
+            flat round dense
+            icon="fas fa-file-excel"
+            color="light-green-10"
+            class="q-ml-md"
+        >
+            <q-tooltip content-class="bg-light-green-10" anchor="bottom left" self="top middle">
+                Import to Excel
+            </q-tooltip>
+
+            <q-popup-edit v-model="fileName" :validate="val => val.length > 0" separate-close-popup anchor="bottom left" self="top middle">
+                <template v-slot="{ initialValue, value, emitValue, validate, set, cancel }">
+                    <q-input
+                        autofocus
+                        dense
+                        :value="fileName"
+                        hint="Save as"
+                        @input="emitValue"
+                    >
+                        <template v-slot:after>
+                            <downloadexcel
+                                :data = "source_data"
+                                :fields = "json_fields"
+                                type="csv"
+                                :before-generate = "startDownload"
+                                :before-finish = "finishDownload"
+                                :name = "fileName + '_report.csv'"
+                            >
+                            <q-btn flat dense color="green-10" icon="save" @click.stop="set"/>
+                            </downloadexcel>
+                        </template>
+                    </q-input>
+                </template>
+            </q-popup-edit>
+        </q-btn>
 
         <q-btn
           flat round dense
@@ -88,7 +117,7 @@
         </q-card>
     </q-dialog>
 
-    <q-dialog full-width v-model="age_table" :persistent="false">
+    <q-dialog full-width v-model="age_table" persistent>
         <q-card style="width: 600px" class="q-px-sm q-pb-md">
             <q-card-section>
                 <q-table
@@ -98,6 +127,7 @@
                 row-key="id"
                 :loading="loading"
                 :visible-columns="visibleColumns"
+                dense
                 >
                     <template v-slot:top="props">
                         <div class="col-3 q-table__title text-h6">Applications by Age</div>
@@ -107,17 +137,46 @@
                         <q-btn
                         flat round dense
                         icon="edit"
-                        color="accent"
+                        color="indigo"
                         class="q-ml-md"
                         @click="filters = true"
                         />
 
                         <q-btn
-                        flat round dense
-                        icon="print"
-                        color="primary"
-                        class="q-ml-md"
-                        />
+                            flat round dense
+                            icon="fas fa-file-excel"
+                            color="light-green-10"
+                            class="q-ml-md"
+                        >
+                            <q-tooltip content-class="bg-light-green-10" anchor="bottom left" self="top middle">
+                                Import to Excel
+                            </q-tooltip>
+
+                            <q-popup-edit v-model="fileName" :validate="val => val.length > 0" separate-close-popup anchor="bottom left" self="top middle">
+                                <template v-slot="{ initialValue, value, emitValue, validate, set, cancel }">
+                                    <q-input
+                                        autofocus
+                                        dense
+                                        :value="fileName"
+                                        hint="Save as"
+                                        @input="emitValue"
+                                    >
+                                        <template v-slot:after>
+                                            <downloadexcel
+                                                :data = "source_data"
+                                                :fields = "json_fields"
+                                                type="csv"
+                                                :before-generate = "startDownload"
+                                                :before-finish = "finishDownload"
+                                                :name = "fileName + '.csv'"
+                                            >
+                                            <q-btn flat dense color="green-10" icon="save"/>
+                                            </downloadexcel>
+                                        </template>
+                                    </q-input>
+                                </template>
+                            </q-popup-edit>
+                        </q-btn>
 
                         <q-btn
                         flat round dense
@@ -156,55 +215,81 @@
 </template>
 
 <script>
+
+import downloadexcel from "vue-json-excel";
+
 export default {
-  data () {
-    return {
-        filters: false,
-        age_table: false,
-        rows: 10,
-        loading: false,
-        pagination: {
-            rowsPerPage: 10
-        },
-        visibleColumns: ['action', 'userId', 'id', 'title', 'body'],
-        columns: [
-            { name: "action", align: "center", label: "Action" },
-            {
-                name: "userId",
-                align: "left",
-                label: "User Id",
-                field: "userId",
-                sortable: true
+
+    components: {
+        downloadexcel
+    },
+
+    data () {
+        return {
+            fileName: 'Applications by age',
+            filters: false,
+            age_table: false,
+            rows: 10,
+            loading: false,
+            visibleColumns: ['action', 'userId', 'id', 'title', 'body'],
+            pagination: {
+                rowsPerPage: 10
             },
-            {
-                name: "id",
-                align: "left",
-                label: "ID",
-                field: "id",
-                sortable: true
+            columns: [
+                { name: "action", align: "center", label: "Action" },
+                {
+                    name: "userId",
+                    align: "left",
+                    label: "User Id",
+                    field: "userId",
+                    sortable: true
+                },
+                {
+                    name: "id",
+                    align: "left",
+                    label: "ID",
+                    field: "id",
+                    sortable: true
+                },
+                {
+                    name: "title",
+                    align: "left",
+                    label: "Title",
+                    field: "title",
+                    sortable: true
+                },
+                {
+                    name: "body",
+                    align: "left",
+                    label: "Body",
+                    field: "body",
+                    sortable: true
+                },
+            ],
+
+            json_fields: {
+                    'USER ID': 'userId',
+                    'ID' : 'id',
+                    'CITY' : 'title',
+                    'Body': 'body',
             },
-            {
-                name: "title",
-                align: "left",
-                label: "Title",
-                field: "title",
-                sortable: true
-            },
-            {
-                name: "body",
-                align: "left",
-                label: "Body",
-                field: "body",
-                sortable: true
-            },
-        ],
-        source_list: [],
-        source_data: [],
-        amId: "",
-        dateFrom: "",
-        dateTo: ""
-    }
-  },
+
+            json_meta: [
+                [
+                    {
+                        'key': 'charset',
+                        'value': 'utf-8'
+                    }
+                ]
+            ],
+                
+            source_list: [],
+            source_data: [],
+            amId: "",
+            dateFrom: "",
+            dateTo: ""
+        }
+    },
 
     computed: {
         baseUri() {
@@ -212,7 +297,7 @@ export default {
         },
     },
 
-    method: {
+    methods: {
         getSourceOfIncome(income) {
             var url = this.baseUri.concat(income+"/"+amId+"/"+dateFrom+"/"+dateTo)
                 this.$axios
@@ -221,6 +306,14 @@ export default {
                     this.source_data = response["date"]
                 })
                 .catch(error => console.log(error))
+        },
+
+        startDownload(){
+            this.loading = true
+        },
+
+        finishDownload(){
+            this.loading = false
         }
     },
 

@@ -339,6 +339,10 @@ export default {
         soi_status() {
             return this.$store.state.components.soi_comp
         }
+    },
+
+    created () {
+        console.log("Date: " + this.startingDate)
     }
 }
 </script>
