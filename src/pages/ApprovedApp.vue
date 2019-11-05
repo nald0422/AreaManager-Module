@@ -4,110 +4,237 @@
       title="Treats"
       :data="source_data"
       :columns="columns"
+      :filter="approved_application_filter"
       row-key="id"
       :loading="loading"
       dense
       :visible-columns="visibleColumns"
       :pagination.sync="pagination"
     >
-      <template v-slot:top="props">
-        <div class="col-3 q-table__title text-h6">Approved Applications</div>
-
-        <q-space />
-
-        <q-btn
-          flat round dense
-          icon="edit"
-          color="indigo"
-          class="q-ml-md"
-          @click="filters = true"
-        />
-        
-        <q-btn
-            flat round dense
-            icon="fas fa-file-excel"
-            color="light-green-10"
-            class="q-ml-md"
-        >
-            <q-tooltip content-class="bg-light-green-10" anchor="bottom left" self="top middle">
-                Import to Excel
-            </q-tooltip>
-
-            <q-popup-edit v-model="fileName" :validate="val => val.length > 0" separate-close-popup anchor="bottom left" self="top middle">
-                <template v-slot="{ initialValue, value, emitValue, validate, set, cancel }">
-                    <q-input
-                        autofocus
-                        dense
-                        :value="fileName"
-                        hint="Save as"
-                        @input="emitValue"
-                    >
-                        <template v-slot:after>
-                            <downloadexcel
-                                :data = "source_data"
-                                :fields = "json_fields"
-                                type="csv"
-                                :before-generate = "startDownload"
-                                :before-finish = "finishDownload"
-                                :name = "fileName + '.csv'"
-                            >
-                                <q-btn flat dense color="green-10" icon="save"/>
-                            </downloadexcel>
-                        </template>
-                    </q-input>
+    
+        <template v-slot:header-cell-userId="props">
+            <q-th :props="props">
+                {{ props.col.label }}
+                <q-popup-proxy context-menu>
+                <q-banner class="q-mt-xs">
+                <template v-slot:avatar>
+                    <q-icon 
+                        name="fas fa-filter" 
+                        size="xs" dense round 
+                        color="grey-10" />
                 </template>
-            </q-popup-edit>
-        </q-btn>
-        
-        <q-btn
-          flat round dense
-          :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
-          @click="props.toggleFullscreen"
-          class="q-ml-md"
-        />
-      </template>
+                <q-input
+                    ref="input"     
+                    color = "deep-orange" filled dense 
+                    label="Search"
+                    v-model="user_filter_input"
+                    square
+                    autofocus
+                />
+                </q-banner>
+                    <q-list dense padding class="rounded-borders filtered-list">
+                            <q-item clickable v-ripple v-for="filtered_user in filtered_users" :key="filtered_user">
+                                <q-item-section>
+                                    <q-checkbox v-model="selected_filtered_users" :val="filtered_user" color="deep-orange-7" :label="filtered_user" />
+                                </q-item-section>
+                            </q-item>
+                    </q-list>
+                </q-popup-proxy>
+            </q-th>
+        </template>
 
-      <template v-slot:body="props">
-            <q-tr :props="props">
-                <q-td key="userId" :props="props">{{ props.row.userId }}</q-td>
-                <q-td key="id" :props="props">{{ props.row.id }}</q-td>
-                <q-td key="title" class="text-ellipsis" :props="props">
-                    {{ props.row.title }}
-                    <q-popup-edit v-model="props.row.title">
-                    <span>{{ props.row.title }}</span>
-                    </q-popup-edit>
-                </q-td>
-                <q-td key="body" class="text-ellipsis" :props="props">
-                    {{ props.row.body }}
-                    <q-popup-edit v-model="props.row.body">
-                    <span>{{ props.row.body }}</span>
-                    </q-popup-edit>
-                </q-td>
-                <q-td key="action" :props="props" class="q-gutter-xs" style="min-width: 140px;">
-                    <q-btn
-                    color="primary"
-                    class="btn-action"
-                    icon="visibility"
-                    size="sm"
-                    @click="onView(props.row)"
-                    />
-                    <q-btn
-                    color="secondary"
-                    class="btn-action"
-                    icon="edit"
-                    size="sm"
-                    @click="onUpdate(props.row)"
-                    />
-                    <q-btn
-                    color="deep-orange"
-                    class="btn-action"
-                    icon="delete"
-                    size="sm"
-                    @click="onDelete(props.row)"
-                    />
-                </q-td>
-            </q-tr>
-      </template>
+        <template v-slot:header-cell-id="props">
+            <q-th :props="props">
+                {{ props.col.label }}
+                <q-popup-proxy context-menu>
+                <q-banner class="q-mt-xs">
+                <template v-slot:avatar>
+                    <q-icon 
+                        name="fas fa-filter" 
+                        size="xs" dense round 
+                        color="grey-10" />
+                </template>
+                <q-input
+                    ref="input"     
+                    color = "deep-orange" filled dense 
+                    label="Search"
+                    v-model="id_filter_input"
+                    square
+                    autofocus
+                />
+                </q-banner>
+                    <q-list dense padding class="rounded-borders filtered-list">
+                            <q-item clickable v-ripple v-for="filtered_id in filtered_ids" :key="filtered_id">
+                                <q-item-section>
+                                    <q-checkbox v-model="selected_filtered_id" :val="filtered_id" color="deep-orange-7" :label="filtered_id" />
+                                </q-item-section>
+                            </q-item>
+                    </q-list>
+                </q-popup-proxy>
+            </q-th>
+        </template>
+
+        <template v-slot:header-cell-title="props">
+            <q-th :props="props">
+                {{ props.col.label }}
+                <q-popup-proxy context-menu>
+                <q-banner class="q-mt-xs">
+                <template v-slot:avatar>
+                    <q-icon 
+                        name="fas fa-filter" 
+                        size="xs" dense round 
+                        color="grey-10" />
+                </template>
+                <q-input
+                    ref="input"     
+                    color = "deep-orange" filled dense 
+                    label="Search"
+                    v-model="title_filter_input"
+                    square
+                    autofocus
+                />
+                </q-banner>
+                    <q-list dense padding class="rounded-borders filtered-list">
+                            <q-item clickable v-ripple v-for="filtered_title in filtered_titles" :key="filtered_title">
+                                <q-item-section>
+                                    <q-checkbox v-model="selected_filtered_title" :val="filtered_title" color="deep-orange-7" :label="filtered_title" />
+                                </q-item-section>
+                            </q-item>
+                    </q-list>
+                </q-popup-proxy>
+            </q-th>
+        </template>
+
+        <template v-slot:header-cell-body="props">
+            <q-th :props="props">
+                {{ props.col.label }}
+                <q-popup-proxy context-menu>
+                <q-banner class="q-mt-xs">
+                <template v-slot:avatar>
+                    <q-icon 
+                        name="fas fa-filter" 
+                        size="xs" dense round 
+                        color="grey-10" />
+                </template>
+                <q-input
+                    ref="input"     
+                    color = "deep-orange" filled dense 
+                    label="Search"
+                    v-model="body_filter_input"
+                    square
+                    autofocus
+                />
+                </q-banner>
+                    <q-list dense padding class="rounded-borders filtered-list">
+                            <q-item clickable v-ripple v-for="filtered_body in filtered_bodies" :key="filtered_body">
+                                <q-item-section>
+                                    <q-checkbox v-model="selected_filtered_body" :val="filtered_body" color="deep-orange-7" :label="filtered_body" />
+                                </q-item-section>
+                            </q-item>
+                    </q-list>
+                </q-popup-proxy>
+            </q-th>
+        </template>
+
+        <template v-slot:top="props">
+            <div class="col-3 q-table__title text-h6">Approved Applications</div>
+            <q-space />
+
+            <q-input square dense color="deep-orange-7" v-model="soi_application_filter">
+                <template v-slot:append>
+                    <q-icon name="search" />
+                </template>
+            </q-input>
+
+            <q-btn
+            flat round dense
+            icon="menu"
+            color="grey-10"
+            class="q-ml-md"
+            >
+                <q-menu fit anchor="bottom left" self="top left" content-class="bg-grey-10 text-white">
+                    <q-list style="min-width: 100px">
+                        <q-item clickable v-ripple @click="filters=true">
+                            <q-item-section avatar>
+                                <q-icon name="edit" color="yellow-8" round flat dense></q-icon>
+                            </q-item-section>
+                            <q-item-section>Edit table</q-item-section>
+                        </q-item>
+                        <q-item clickable v-ripple @click="print_json()">
+                            <q-item-section avatar>
+                                <q-icon name="picture_as_pdf" color="red-6" round flat dense></q-icon>
+                            </q-item-section>
+                            <q-item-section>Preview in PDF</q-item-section>
+                        </q-item>
+                        <downloadexcel
+                                    :data = "source_data"
+                                    :fields = "json_fields"
+                                    type="csv"
+                                    :before-generate = "startDownload"
+                                    :before-finish = "finishDownload"
+                                    :name = "fileName + '.csv'"
+                        >
+                            <q-item clickable v-ripple>
+                                <q-item-section avatar>
+                                    <q-icon name="fas fa-file-excel" color="green" round flat dense></q-icon>
+                                </q-item-section>
+                                <q-item-section>Download as csv</q-item-section>
+                            </q-item>
+                        </downloadexcel>
+                    </q-list>
+                </q-menu>
+                <q-tooltip>Menu</q-tooltip>
+            </q-btn>
+            
+            <q-btn
+            flat round dense
+            :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+            @click="props.toggleFullscreen"
+            class="q-ml-md"
+            />
+        </template>
+
+        <template v-slot:body="props">
+                <q-tr :props="props">
+                    <q-td key="userId" :props="props">{{ props.row.userId }}</q-td>
+                    <q-td key="id" :props="props">{{ props.row.id }}</q-td>
+                    <q-td key="title" class="text-ellipsis" :props="props">
+                        {{ props.row.title }}
+                        <q-popup-edit v-model="props.row.title">
+                        <span>{{ props.row.title }}</span>
+                        </q-popup-edit>
+                    </q-td>
+                    <q-td key="body" class="text-ellipsis" :props="props">
+                        {{ props.row.body }}
+                        <q-popup-edit v-model="props.row.body">
+                        <span>{{ props.row.body }}</span>
+                        </q-popup-edit>
+                    </q-td>
+                    <q-td key="action" :props="props" class="q-gutter-xs" style="min-width: 140px;">
+                        <q-btn
+                        color="primary"
+                        class="btn-action"
+                        icon="visibility"
+                        size="sm"
+                        @click="onView(props.row)"
+                        />
+                        <q-btn
+                        color="secondary"
+                        class="btn-action"
+                        icon="edit"
+                        size="sm"
+                        @click="onUpdate(props.row)"
+                        />
+                        <q-btn
+                        color="deep-orange"
+                        class="btn-action"
+                        icon="delete"
+                        size="sm"
+                        @click="onDelete(props.row)"
+                        />
+                    </q-td>
+                </q-tr>
+        </template>
     </q-table>
 
     <q-dialog v-model="filters" :persistent="true">
@@ -204,13 +331,61 @@ export default {
             source_data: [],
             amId: "",
             dateFrom: "",
-            dateTo: "",            
+            dateTo: "",          
+            
+            btnRipple: { center: true, color: 'indigo-10', keyCodes: [] },
+
+            approved_application_filter: '',
+
+            user_filter_input: '',
+            id_filter_input: '',
+            title_filter_input: '',
+            body_filter_input: '',
+
+            duplicate_users: [],
+            duplicate_id: [],
+            duplicate_title: [],
+            duplicate_body: [],
+
+            unique_users: [],
+            unique_id: [],
+            unique_title: [],
+            unique_body: [],
+            
+            selected_filtered_users: [],
+            selected_filtered_id: [],
+            selected_filtered_title: [],
+            selected_filtered_body: [],
         }
     },
 
     computed: {
         baseUri() {
             return this.$store.state.util.base_uri;
+        },
+
+        filtered_users() {
+            return this.unique_users.filter((element) => {
+                return element.match(this.user_filter_input);
+            })
+        },
+
+        filtered_ids() {
+            return this.unique_id.filter((element) => {
+                return element.match(this.id_filter_input);
+            })
+        },
+
+        filtered_titles() {
+            return this.unique_title.filter((element) => {
+                return element.match(this.title_filter_input);
+            })
+        },
+
+        filtered_bodies() {
+            return this.unique_body.filter((element) => {
+                return element.match(this.body_filter_input);
+            })
         },
     },
 
@@ -223,6 +398,19 @@ export default {
                     this.source_data = response["date"]
                 })
                 .catch(error => console.log(error))
+        },
+
+        print_json() {
+            // console.log("Data : " + JSON.stringify(this.source_data))
+            printJS({
+                printable: this.source_data, 
+                properties: ['userId', 'id', 'title', 'body'], 
+                type: 'json',
+                header: '<h3 class="custom-h3">SOURCE OF INCOME</h3>',
+                headerStyle: 'font-weight: 300;',
+                style: '.custom-h3 { color: #212121; }',
+                repeatTableHeader: true
+                })
         },
 
         startDownload(){
@@ -242,12 +430,26 @@ export default {
             // console.log(JSON.stringify(response.data));
             this.source_data = response.data
             this.loading = false
+            this.source_data.forEach(element => {
+                this.duplicate_users.push(JSON.stringify(element.userId))
+                this.duplicate_id.push(JSON.stringify(element.id))
+                this.duplicate_title.push(JSON.stringify(element.title))
+                this.duplicate_body.push(JSON.stringify(element.body))
+            });
+            
+            this.unique_users = Array.from(new Set(this.duplicate_users))
+            this.unique_id = Array.from(new Set(this.duplicate_id))
+            this.unique_title = Array.from(new Set(this.duplicate_title))
+            this.unique_body = Array.from(new Set(this.duplicate_body))
         })
         .catch(error => console.log(error))
   },
 }
 </script>
 
-<style scoped>
-
+<style scoped lang="sass">
+.q-table__title
+    color: #1a237e
+.filtered-list
+    width: 300px
 </style>

@@ -22,15 +22,15 @@
             <q-avatar size="26px">
               <img src="https://cdn.quasar.dev/img/boy-avatar.png">
             </q-avatar>
-            <q-menu fit anchor="bottom left" self="top left">
+            <q-menu square fit anchor="bottom left" self="top left" content-class="bg-grey-10 text-white" :offset="[50, 11]">
                 <q-list style="min-width: 100px">
-                    <q-item clickable v-ripple active>
+                    <q-item clickable v-ripple>
                         <q-item-section avatar>
                             <q-icon name = "trending_flat"></q-icon>
                         </q-item-section>
                         <q-item-section>Logout</q-item-section>
                     </q-item>
-                    <q-item clickable v-ripple active @click="accountSettings_Modal=true">
+                    <q-item clickable v-ripple @click="accountSettings_Modal=true">
                         <q-item-section avatar>
                             <q-icon name = "group"></q-icon>
                         </q-item-section>
@@ -164,7 +164,7 @@
             <div class="SEARCH__card">
                 <div class="fit row wrap justify-start items-start content-start">
                     <div class="col-3 self-start q-pa-md">
-                        <q-input dense filled v-model="startingDate" mask="date" :rules="['date']" placeholder="Ending date" hint="Date to"  color="purple-12">
+                        <q-input dense filled v-model="startingDate" mask="date" :rules="['date']" placeholder="Ending date" hint="Date from"  color="deep-orange-7">
                             <template v-slot:append>
                                 <q-icon name="event" class="cursor-pointer">
                                     <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale" v-model="starting_calendar">
@@ -175,7 +175,7 @@
                         </q-input>
                     </div>
                     <div class="col-3 self-start q-pa-md">
-                        <q-input dense filled v-model="endingDate" mask="date" :rules="['date']" placeholder="Ending date" hint="Date to"  color="purple-12">
+                        <q-input dense filled v-model="endingDate" mask="date" :rules="['date']" placeholder="Ending date" hint="Date to"  color="deep-orange-7">
                             <template v-slot:append>
                                 <q-icon name="event" class="cursor-pointer">
                                     <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale" v-model="ending_calendar">
@@ -255,8 +255,8 @@ export default {
             assignBranches_modal: false,
             exactPhrase: '',
             hasWords: '',
-            startingDate: date.formatDate(Date.now(), 'YYYY-MM-DD'),
-            endingDate: date.formatDate(Date.now(), 'YYYY-MM-DD'),
+            startingDate: date.formatDate(Date.now(), 'YYYY/MM/DD'),
+            endingDate: date.formatDate(Date.now(), 'YYYY/MM/DD'),
             starting_calendar: false,
             ending_calendar: false,
             excludeWords: '',
@@ -338,6 +338,20 @@ export default {
     computed: {
         soi_status() {
             return this.$store.state.components.soi_comp
+        }
+    },
+
+    watch: {
+        accountSettings_Modal: function() {
+            if(this.accountSettings_Modal == true) {
+                console.log('Account Settings Modal')
+            }
+        },
+
+        assignBranches_modal: function() {
+            if(this.assignBranches_modal == true) {
+                console.log('Assign Branches Modal')
+            }
         }
     },
 
