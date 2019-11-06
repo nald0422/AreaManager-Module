@@ -147,10 +147,17 @@
             </q-input>
 
             <q-btn
-            flat round dense
-            icon="menu"
-            color="grey-10"
-            class="q-ml-md"
+                flat round dense
+                icon="search"
+                color="grey-10"
+                class="q-ml-xs"
+            />
+
+            <q-btn
+                flat round dense
+                icon="menu"
+                color="grey-10"
+                class="q-ml-md"
             >
                 <q-menu fit anchor="bottom left" self="top left" content-class="bg-grey-10 text-white">
                     <q-list style="min-width: 100px">
@@ -387,19 +394,19 @@ export default {
                 return element.match(this.body_filter_input);
             })
         },
+
+        selectedItems: function () {
+            return this.source_data.filter(function (user) {
+                return user.userId.match(this.selected_filtered_users);
+            }, this);
+        },
     },
 
-    // watch: {
-    //     selected_filtered_users: function() {
-    //         return this.source_data.filter((element) => {
-    //             for(let i = 0; i < source_data.length; i++) {
-    //             this.source_data.filter((element) => {
-    //                 return element.userId.match(this.selected_filtered_users[i])
-    //                 })
-    //             }
-    //         })
-    //     }
-    // },
+    watch: {
+        computed_filtered_users: function() {
+            console.log("Filtered 123")
+        }
+    },
 
     methods: {
         getSourceOfIncome(income) {
@@ -410,6 +417,14 @@ export default {
                     this.source_data = response["date"]
                 })
                 .catch(error => console.log(error))
+        },
+
+        update_filtered_users(filterArray) {
+            this.source_data = this.source_data.filter(function (user) {
+                return user.userId.includes(filterArray)
+            })
+
+            console.log("Filtered")
         },
 
         edit_soi(status){
@@ -435,7 +450,7 @@ export default {
 
         finishDownload(){
             this.loading = false
-        }
+        },
     },
 
     created() {
@@ -461,11 +476,11 @@ export default {
         })
         .catch(error => console.log(error))
 
-        this.edit_soi(true)
+        // this.edit_soi(true)
     },  
 
     beforeDestroy() {
-        this. edit_soi(false)
+        // this.edit_soi(false)
     }
 }
 </script>

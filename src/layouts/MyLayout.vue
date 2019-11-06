@@ -225,7 +225,9 @@
                 </div>
             </div>
         </div>
-      <router-view />
+        <!-- <keep-alive> -->
+            <router-view />
+        <!-- </keep-alive> -->
     </q-page-container>
   </q-layout>
 </template>
@@ -264,7 +266,7 @@ export default {
             byDate: 'Any time',
             links1: [
                 { icon: 'check', text: 'Appproved Applications', color: 'yellow', route: '/approvedApp' },
-                { icon: 'group_work', text: 'Applications by Age', color: 'light-blue', route: '/appByAge' },
+                { icon: 'group_work', text: 'Applications by Age', color: 'orange-9', route: '/appByAge' },
                 { icon: 'attach_money', text: 'Source of Income', color: 'green-14', route: '/sourceIncome' },
             ],
 
@@ -352,7 +354,7 @@ export default {
             if(this.assignBranches_modal == true) {
                 console.log('Assign Branches Modal')
             }
-        }
+        },
     },
 
     created () {

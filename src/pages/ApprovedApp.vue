@@ -140,7 +140,7 @@
             <div class="col-3 q-table__title text-h6">Approved Applications</div>
             <q-space />
 
-            <q-input square dense color="deep-orange-7" v-model="soi_application_filter">
+            <q-input square dense color="deep-orange-7" v-model="approved_application_filter">
                 <template v-slot:append>
                     <q-icon name="search" />
                 </template>
