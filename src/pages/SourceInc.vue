@@ -35,7 +35,9 @@
                     <q-list dense padding class="rounded-borders filtered-list">
                             <q-item clickable v-ripple v-for="filtered_user in filtered_users" :key="filtered_user">
                                 <q-item-section>
-                                    <q-checkbox v-model="selected_filtered_users" :val="filtered_user" color="deep-orange-7" :label="filtered_user" />
+                                    <!-- <q-checkbox v-model="selected_filtered_users" :val="filtered_user" color="deep-orange-7" :label="filtered_user" /> -->
+                                    <input type="checkbox" :id="filtered_user" :value="{userId: filtered_user}" v-model="selected_filtered_users" :label="filtered_user">
+                                    <label for="filtered_user">{{filtered_user}}</label>
                                 </q-item-section>
                             </q-item>
                     </q-list>
@@ -145,13 +147,6 @@
                     <q-icon name="search" />
                 </template>
             </q-input>
-
-            <q-btn
-                flat round dense
-                icon="search"
-                color="grey-10"
-                class="q-ml-xs"
-            />
 
             <q-btn
                 flat round dense
@@ -271,6 +266,8 @@
 import downloadexcel from "vue-json-excel";
 import { date } from 'quasar'
 
+let app;
+
 export default {
     components: {
         downloadexcel
@@ -359,7 +356,7 @@ export default {
             unique_title: [],
             unique_body: [],
             
-            selected_filtered_users: [],
+            selected_filtered_users: [{userId: 2}],
             selected_filtered_id: [],
             selected_filtered_title: [],
             selected_filtered_body: [],
@@ -394,21 +391,29 @@ export default {
                 return element.match(this.body_filter_input);
             })
         },
-
-        selectedItems: function () {
-            return this.source_data.filter(function (user) {
-                return user.userId.match(this.selected_filtered_users);
-            }, this);
-        },
     },
 
     watch: {
-        computed_filtered_users: function() {
-            console.log("Filtered 123")
+        selected_filtered_users: function() {
+            console.log("Data : " + JSON.stringify(this.selected_filtered_users))
+            // this.getUserId(this.selected_filtered_users)
         }
     },
 
     methods: {
+        getUserId(filters) {
+             return this.source_data.filter(function (o) {
+                 return Object.keys(filters).every(function (k) {
+                    return o[k].split(',').some(function (v) {
+                       return v === filters[k];
+                    });
+                });
+            });
+            //.map(function (o) {
+            //    return o.title;
+            //});
+        },
+
         getSourceOfIncome(income) {
             var url = this.baseUri.concat(income+"/"+amId+"/"+dateFrom+"/"+dateTo);
                 this.$axios
@@ -417,14 +422,6 @@ export default {
                     this.source_data = response["date"]
                 })
                 .catch(error => console.log(error))
-        },
-
-        update_filtered_users(filterArray) {
-            this.source_data = this.source_data.filter(function (user) {
-                return user.userId.includes(filterArray)
-            })
-
-            console.log("Filtered")
         },
 
         edit_soi(status){
@@ -475,6 +472,9 @@ export default {
             this.unique_body = Array.from(new Set(this.duplicate_body))
         })
         .catch(error => console.log(error))
+
+        console.log("selected : " + this.selected_filtered_users)
+        console.log("Filtered : " +  this.getUserId(this.selected_filtered_users))
 
         // this.edit_soi(true)
     },  

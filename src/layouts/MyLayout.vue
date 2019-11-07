@@ -265,9 +265,10 @@ export default {
             byWebsite: '',
             byDate: 'Any time',
             links1: [
-                { icon: 'check', text: 'Appproved Applications', color: 'yellow', route: '/approvedApp' },
-                { icon: 'group_work', text: 'Applications by Age', color: 'orange-9', route: '/appByAge' },
-                { icon: 'attach_money', text: 'Source of Income', color: 'green-14', route: '/sourceIncome' },
+                { icon: 'check', text: 'Appproved Applications', color: 'yellow-7', route: '/approvedApp' },
+                { icon: 'group_work', text: 'Applications by Age', color: 'yellow-7', route: '/appByAge' },
+                { icon: 'attach_money', text: 'Source of Income', color: 'yellow-7', route: '/sourceIncome' },
+                { icon: 'games', text: 'Playground', color: 'yellow-7', route: '/playground' },
             ],
 
             dropdown_label: 'Source of Income',

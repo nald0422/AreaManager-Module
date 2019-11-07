@@ -259,56 +259,52 @@
                 >
                     <template v-slot:top="props">
                         <div class="col-3 q-table__title text-h6">Applications by Age</div>
-
                         <q-space />
-
-                        <q-btn
-                        flat round dense
-                        icon="edit"
-                        color="indigo"
-                        class="q-ml-md"
-                        @click="filters = true"
-                        />
-
-                        <q-btn
-                            flat round dense
-                            icon="fas fa-file-excel"
-                            color="green"
-                            class="q-ml-md"
-                        >
-                            <q-tooltip content-class="bg-green" anchor="bottom left" self="top middle">
-                                Import to Excel
-                            </q-tooltip>
-
-                            <q-popup-edit v-model="fileName" :validate="val => val.length > 0" separate-close-popup anchor="bottom left" self="top middle">
-                                <template v-slot="{ initialValue, value, emitValue, validate, set, cancel }">
-                                    <q-input
-                                        autofocus
-                                        dense
-                                        :value="fileName"
-                                        hint="Save as"
-                                        @input="emitValue"
-                                    >
-                                        <template v-slot:after>
-                                            <downloadexcel
-                                                :data = "source_data"
-                                                :fields = "json_fields"
-                                                type="csv"
-                                                :before-generate = "startDownload"
-                                                :before-finish = "finishDownload"
-                                                :name = "fileName + '_report.csv'"
-                                                >
-                                                <q-btn round flat dense color="cyan" icon="fas fa-arrow-circle-down">
-                                                    <q-tooltip content-class="bg-grey-10" anchor="bottom left" self="top middle">
-                                                        Download
-                                                    </q-tooltip>
-                                                </q-btn>
-                                            </downloadexcel>
-                                        </template>
-                                    </q-input>
+                            <q-input square dense color="deep-orange-7" v-model="age_application_filter">
+                                <template v-slot:append>
+                                    <q-icon name="search" />
                                 </template>
-                            </q-popup-edit>
-                        </q-btn>
+                             </q-input>
+
+                            <q-btn
+                            flat round dense
+                            icon="menu"
+                            color="grey-10"
+                            class="q-ml-md"
+                            >
+                                <q-menu fit anchor="bottom left" self="top left" content-class="bg-grey-10 text-white">
+                                    <q-list style="min-width: 100px">
+                                        <q-item clickable v-ripple @click="filters=true">
+                                            <q-item-section avatar>
+                                                <q-icon name="edit" color="yellow-8" round flat dense></q-icon>
+                                            </q-item-section>
+                                            <q-item-section>Edit table</q-item-section>
+                                        </q-item>
+                                        <q-item clickable v-ripple @click="print_json()">
+                                            <q-item-section avatar>
+                                                <q-icon name="picture_as_pdf" color="red-6" round flat dense></q-icon>
+                                            </q-item-section>
+                                            <q-item-section>Preview in PDF</q-item-section>
+                                        </q-item>
+                                        <downloadexcel
+                                                    :data = "source_data"
+                                                    :fields = "json_fields"
+                                                    type="csv"
+                                                    :before-generate = "startDownload"
+                                                    :before-finish = "finishDownload"
+                                                    :name = "fileName + '.csv'"
+                                        >
+                                            <q-item clickable v-ripple>
+                                                <q-item-section avatar>
+                                                    <q-icon name="fas fa-file-excel" color="green" round flat dense></q-icon>
+                                                </q-item-section>
+                                                <q-item-section>Download as csv</q-item-section>
+                                            </q-item>
+                                        </downloadexcel>
+                                    </q-list>
+                                </q-menu>
+                                <q-tooltip>Menu</q-tooltip>
+                            </q-btn>
 
                         <q-btn
                         flat round dense
