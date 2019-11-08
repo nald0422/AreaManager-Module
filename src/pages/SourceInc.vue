@@ -1,5 +1,70 @@
 <template>
     <div class="q-pa-md">
+        <div class="SEARCH__container q-pb-md">
+            <div class="SEARCH__card">
+                <div class="fit row wrap justify-start items-start content-start">
+                    <div class="col-3 self-start q-pa-md">
+                        <q-input dense filled v-model="startingDate" mask="date" :rules="['date']" placeholder="Ending date" hint="Date from"  color="yellow-8">
+                            <template v-slot:append>
+                                <q-icon name="event" class="cursor-pointer">
+                                    <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale" v-model="starting_calendar">
+                                        <q-date color="yellow-8" v-model="startingDate" @input="closeDialog(starting_calendar)" />
+                                    </q-popup-proxy>
+                                </q-icon>
+                            </template>
+                        </q-input>
+                    </div>
+                    <div class="col-3 self-start q-pa-md">
+                        <q-input dense filled v-model="endingDate" mask="date" :rules="['date']" placeholder="Ending date" hint="Date to"  color="yellow-8">
+                            <template v-slot:append>
+                                <q-icon name="event" class="cursor-pointer">
+                                    <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale" v-model="ending_calendar">
+                                        <q-date color="yellow-8" v-model="endingDate" @input="closeDialog(ending_calendar)" />
+                                    </q-popup-proxy>
+                                </q-icon>
+                            </template>
+                        </q-input>
+                    </div>
+                    <div class="col-3 offset-1 self-start q-pa-md">
+                        <q-btn-dropdown
+                                color="grey-10"
+                                push
+                                no-caps
+                                @click="onMainClick"
+                                transition="slide-right"
+                        >
+                            <template v-slot:label>
+                                <div class="row items-center no-wrap">
+                                    <q-icon color="yellow-8" left :name="dropdown_style.icon" />
+                                    <div class="text-center">
+                                        {{dropdown_style.label}}
+                                    </div>
+                                </div>
+                            </template>
+
+                            <q-list>
+                                <q-item clickable v-close-popup @click="onItemClick('Self Employed', 'work')">
+                                    <q-item-section avatar>
+                                        <q-avatar icon="work" color="grey-10" text-color="yellow-8" />
+                                    </q-item-section>
+                                    <q-item-section>
+                                        <q-item-label>Self employed</q-item-label>
+                                    </q-item-section>
+                                </q-item>
+                                <q-item clickable v-close-popup @click="onItemClick('Business', 'business')">
+                                    <q-item-section avatar>
+                                        <q-avatar icon="business" color="grey-10" text-color="yellow-8" />
+                                    </q-item-section>
+                                    <q-item-section>
+                                        <q-item-label>Business</q-item-label>
+                                    </q-item-section>
+                                </q-item>
+                            </q-list>
+                        </q-btn-dropdown>
+                    </div>
+                </div>
+            </div>
+        </div>
     <q-table
       title="Treats"
       :data="source_data"
@@ -25,7 +90,7 @@
                 </template>
                 <q-input
                     ref="input"     
-                    color = "deep-orange" filled dense 
+                    color = "yellow-8" filled dense 
                     label="Search"
                     v-model="user_filter_input"
                     square
@@ -68,7 +133,7 @@
                     <q-list dense padding class="rounded-borders filtered-list">
                             <q-item clickable v-ripple v-for="filtered_id in filtered_ids" :key="filtered_id">
                                 <q-item-section>
-                                    <q-checkbox v-model="selected_filtered_id" :val="filtered_id" color="deep-orange-7" :label="filtered_id" />
+                                    <q-checkbox v-model="selected_filtered_id" :val="filtered_id" color="yellow-8" :label="filtered_id" />
                                 </q-item-section>
                             </q-item>
                     </q-list>
@@ -99,7 +164,7 @@
                     <q-list dense padding class="rounded-borders filtered-list">
                             <q-item clickable v-ripple v-for="filtered_title in filtered_titles" :key="filtered_title">
                                 <q-item-section>
-                                    <q-checkbox v-model="selected_filtered_title" :val="filtered_title" color="deep-orange-7" :label="filtered_title" />
+                                    <q-checkbox v-model="selected_filtered_title" :val="filtered_title" color="yellow-8" :label="filtered_title" />
                                 </q-item-section>
                             </q-item>
                     </q-list>
@@ -130,7 +195,7 @@
                     <q-list dense padding class="rounded-borders filtered-list">
                             <q-item clickable v-ripple v-for="filtered_body in filtered_bodies" :key="filtered_body">
                                 <q-item-section>
-                                    <q-checkbox v-model="selected_filtered_body" :val="filtered_body" color="deep-orange-7" :label="filtered_body" />
+                                    <q-checkbox v-model="selected_filtered_body" :val="filtered_body" color="yellow-8" :label="filtered_body" />
                                 </q-item-section>
                             </q-item>
                     </q-list>
@@ -139,61 +204,61 @@
         </template>
 
         <template v-slot:top="props">
-            <div class="col-3 q-table__title text-h6">Source of Income</div>
-            <q-space />
+                <div class="q-table__title text-center text-h6">Source of Income</div>            
+                <q-space />
 
-            <q-input square dense color="deep-orange-7" v-model="soi_application_filter">
-                <template v-slot:append>
-                    <q-icon name="search" />
-                </template>
-            </q-input>
-
-            <q-btn
-                flat round dense
-                icon="menu"
-                color="grey-10"
-                class="q-ml-md"
-            >
-                <q-menu fit anchor="bottom left" self="top left" content-class="bg-grey-10 text-white">
-                    <q-list style="min-width: 100px">
-                        <q-item clickable v-ripple @click="filters=true">
-                            <q-item-section avatar>
-                                <q-icon name="edit" color="yellow-8" round flat dense></q-icon>
-                            </q-item-section>
-                            <q-item-section>Edit table</q-item-section>
-                        </q-item>
-                        <q-item clickable v-ripple @click="print_json()">
-                            <q-item-section avatar>
-                                <q-icon name="picture_as_pdf" color="red-6" round flat dense></q-icon>
-                            </q-item-section>
-                            <q-item-section>Preview in PDF</q-item-section>
-                        </q-item>
-                        <downloadexcel
-                                    :data = "source_data"
-                                    :fields = "json_fields"
-                                    type="csv"
-                                    :before-generate = "startDownload"
-                                    :before-finish = "finishDownload"
-                                    :name = "fileName + '.csv'"
-                        >
-                            <q-item clickable v-ripple>
+                <q-input square dense color="yellow-8" v-model="soi_application_filter">
+                    <template v-slot:append>
+                        <q-icon name="search" />
+                    </template>
+                </q-input>
+                
+                <q-btn
+                    flat round dense
+                    icon="menu"
+                    color="grey-10"
+                    class="q-ml-md"
+                >
+                    <q-menu fit anchor="bottom left" self="top left" content-class="bg-grey-10 text-white">
+                        <q-list style="min-width: 100px">
+                            <q-item clickable v-ripple @click="filters=true">
                                 <q-item-section avatar>
-                                    <q-icon name="fas fa-file-excel" color="green" round flat dense></q-icon>
+                                    <q-icon name="edit" color="yellow-8" round flat dense></q-icon>
                                 </q-item-section>
-                                <q-item-section>Download as csv</q-item-section>
+                                <q-item-section>Edit table</q-item-section>
                             </q-item>
-                        </downloadexcel>
-                    </q-list>
-                </q-menu>
-                <q-tooltip>Menu</q-tooltip>
-            </q-btn>
-            
-            <q-btn
-            flat round dense
-            :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
-            @click="props.toggleFullscreen"
-            class="q-ml-md"
-            />
+                            <q-item clickable v-ripple @click="print_json()">
+                                <q-item-section avatar>
+                                    <q-icon name="picture_as_pdf" color="red-6" round flat dense></q-icon>
+                                </q-item-section>
+                                <q-item-section>Preview in PDF</q-item-section>
+                            </q-item>
+                            <downloadexcel
+                                        :data = "source_data"
+                                        :fields = "json_fields"
+                                        type="csv"
+                                        :before-generate = "startDownload"
+                                        :before-finish = "finishDownload"
+                                        :name = "fileName + '.csv'"
+                            >
+                                <q-item clickable v-ripple>
+                                    <q-item-section avatar>
+                                        <q-icon name="fas fa-file-excel" color="green" round flat dense></q-icon>
+                                    </q-item-section>
+                                    <q-item-section>Download as csv</q-item-section>
+                                </q-item>
+                            </downloadexcel>
+                        </q-list>
+                    </q-menu>
+                    <q-tooltip>Menu</q-tooltip>
+                </q-btn>
+                
+                <q-btn
+                flat round dense
+                :icon="props.inFullscreen ? 'fullscreen_exit' : 'fullscreen'"
+                @click="props.toggleFullscreen"
+                class="q-ml-md"
+                />
         </template>
 
         <template v-slot:body="props">
@@ -333,10 +398,20 @@ export default {
 
             source_list: [],
             source_data: [],
+            user_data: [],
             amId: '',
-            dateFrom: '',
-            dateTo: '',     
 
+            starting_calendar: false,
+            ending_calendar: false,
+            startingDate: date.formatDate(Date.now(), 'YYYY/MM/DD'),
+            endingDate: date.formatDate(Date.now(), 'YYYY/MM/DD'),    
+
+            dropdown_selected: '',
+            dropdown_style: {
+                label: 'Source of Income',
+                icon: 'money',
+            },
+            
             soi_application_filter: '',
             
             user_filter_input: '',
@@ -356,16 +431,26 @@ export default {
             unique_title: [],
             unique_body: [],
             
-            selected_filtered_users: [{userId: 2}],
+            selected_filtered_users: [],
             selected_filtered_id: [],
             selected_filtered_title: [],
             selected_filtered_body: [],
+
+            token : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsidHlwZSI6IkJ1ZmZlciIsImRhdGEiOlsxMDAsMTExLDExMCw5NywxMDgsMTAwXX0sImlhdCI6MTU3MzIwODEyNiwiZXhwIjoxNTczMjk0NTI2fQ.pPKgDJsOirqcU50XOlNwKsobkEG4CBmntcfiRu29LBA'
         }
     },
 
     computed: {
         baseUri() {
             return this.$store.state.util.base_uri;
+        },
+
+        getDateFrom() {
+            return this.$store.state.components.date_from
+        },
+
+        getDateTo() {
+            return this.$store.state.components.date_to
         },
 
         filtered_users() {
@@ -397,6 +482,14 @@ export default {
         selected_filtered_users: function() {
             console.log("Data : " + JSON.stringify(this.selected_filtered_users))
             // this.getUserId(this.selected_filtered_users)
+        },
+
+        startingDate: function() {
+            console.log("Date From : " + this.dateFrom)
+        },
+
+        endingDate: function() {
+            console.log("Date to : " + this.dateTo)
         }
     },
 
@@ -415,13 +508,17 @@ export default {
         },
 
         getSourceOfIncome(income) {
-            var url = this.baseUri.concat(income+"/"+amId+"/"+dateFrom+"/"+dateTo);
-                this.$axios
-                .get(url)
-                .then(response => {
-                    this.source_data = response["date"]
-                })
-                .catch(error => console.log(error))
+            // var url = this.baseUri.concat(income+"/"+amId+"/"+dateFrom+"/"+dateTo);
+            //     this.$axios
+            //     .get(url)
+            //     .then(response => {
+            //         this.source_data = response["date"]
+            //     })
+            //     .catch(error => console.log(error))
+        },
+
+        getEmployeeList() {
+
         },
 
         edit_soi(status){
@@ -439,6 +536,30 @@ export default {
                 style: '.custom-h3 { color: #212121; }',
                 repeatTableHeader: true
                 })
+        },
+
+        closeDialog(calendar) {
+            if(calendar === this.starting_calendar) {
+                this.starting_calendar = false
+            } else if (calendar === this.ending_calendar) {
+                this.ending_calendar = false
+            }
+        },
+
+        onItemClick(item, icon) {
+            this.dropdown_style.label = item
+            this.dropdown_style.icon = icon
+
+            if(item === "Self Employed") {
+                dropdown_selected = "employment"
+            } else if (item === "Business") {
+                dropdown_selcted = "business"
+            }
+
+        },
+
+        onMainClick() {
+        
         },
 
         startDownload(){
@@ -473,8 +594,19 @@ export default {
         })
         .catch(error => console.log(error))
 
+
+        // console.log("date from :" + this.getDateFrom)
+        // console.log("date to : " + this.getDateTo)
+
         console.log("selected : " + this.selected_filtered_users)
         console.log("Filtered : " +  this.getUserId(this.selected_filtered_users))
+
+        this.$axios
+        .post("http://192.168.2.119:3000/user/login", {username: 'ZG9uYWxk', password: 'Zjk3YThkZWZkMDI5N2YxNDBiNjU0N2FkNTcxNGVkZWE='})
+        .then(response => {
+            console.log("Login Api: " + JSON.stringify(response.data))
+        })
+        .catch(error => console.log(error))
 
         // this.edit_soi(true)
     },  
@@ -487,8 +619,17 @@ export default {
 
 <style scoped lang="sass">
 .q-table__title
-    color: #1a237e
+    color: black
 
 .filtered-list
     width: 300px
+
+.SEARCH
+    &__container
+        position: relative;
+    &__card
+        color: #000
+        background-color: #fff
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2), 0 2px 2px rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12);
+        padding: 5px
 </style>

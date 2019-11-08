@@ -1,5 +1,33 @@
 <template>
     <div class="q-pa-md">
+        <div class="SEARCH__container q-pb-md">
+            <div class="SEARCH__card">
+                <div class="fit row wrap justify-start items-start content-start">
+                    <div class="col-3 self-start q-pa-md">
+                        <q-input dense filled v-model="startingDate" mask="date" :rules="['date']" placeholder="Ending date" hint="Date from"  color="yellow-8">
+                            <template v-slot:append>
+                                <q-icon name="event" class="cursor-pointer">
+                                    <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale" v-model="starting_calendar">
+                                        <q-date color="yellow-8" v-model="startingDate" @input="closeDialog(starting_calendar)" />
+                                    </q-popup-proxy>
+                                </q-icon>
+                            </template>
+                        </q-input>
+                    </div>
+                    <div class="col-3 self-start q-pa-md">
+                        <q-input dense filled v-model="endingDate" mask="date" :rules="['date']" placeholder="Ending date" hint="Date to"  color="yellow-8">
+                            <template v-slot:append>
+                                <q-icon name="event" class="cursor-pointer">
+                                    <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale" v-model="ending_calendar">
+                                        <q-date color="yellow-8" v-model="endingDate" @input="closeDialog(ending_calendar)" />
+                                    </q-popup-proxy>
+                                </q-icon>
+                            </template>
+                        </q-input>
+                    </div>
+                </div>
+            </div>
+        </div>
     <q-table
       title="Treats"
       :data="source_data"
@@ -11,7 +39,6 @@
       :visible-columns="visibleColumns"
       :pagination.sync="pagination"
     >
-    
         <template v-slot:header-cell-userId="props">
             <q-th :props="props">
                 {{ props.col.label }}
@@ -140,7 +167,7 @@
             <div class="col-3 q-table__title text-h6">Approved Applications</div>
             <q-space />
 
-            <q-input square dense color="deep-orange-7" v-model="approved_application_filter">
+            <q-input square dense color="yellow-8" v-model="approved_application_filter">
                 <template v-slot:append>
                     <q-icon name="search" />
                 </template>
@@ -330,8 +357,11 @@ export default {
             source_list: [],
             source_data: [],
             amId: "",
-            dateFrom: "",
-            dateTo: "",          
+
+            starting_calendar: false,
+            ending_calendar: false,
+            startingDate: date.formatDate(Date.now(), 'YYYY/MM/DD'),
+            endingDate: date.formatDate(Date.now(), 'YYYY/MM/DD'),  
             
             btnRipple: { center: true, color: 'indigo-10', keyCodes: [] },
 
@@ -413,6 +443,14 @@ export default {
                 })
         },
 
+        closeDialog(calendar) {
+            if(calendar === this.starting_calendar) {
+                this.starting_calendar = false
+            } else if (calendar === this.ending_calendar) {
+                this.ending_calendar = false
+            }
+        },
+
         startDownload(){
             this.loading = true
         },
@@ -452,4 +490,13 @@ export default {
     color: #1a237e
 .filtered-list
     width: 300px
+
+.SEARCH
+    &__container
+        position: relative;
+    &__card
+        color: #000
+        background-color: #fff
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2), 0 2px 2px rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12);
+        padding: 5px
 </style>

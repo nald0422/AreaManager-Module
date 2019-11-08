@@ -160,74 +160,7 @@
     </q-dialog>
 
     <q-page-container>
-        <div class="SEARCH__container">
-            <div class="SEARCH__card">
-                <div class="fit row wrap justify-start items-start content-start">
-                    <div class="col-3 self-start q-pa-md">
-                        <q-input dense filled v-model="startingDate" mask="date" :rules="['date']" placeholder="Ending date" hint="Date from"  color="deep-orange-7">
-                            <template v-slot:append>
-                                <q-icon name="event" class="cursor-pointer">
-                                    <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale" v-model="starting_calendar">
-                                        <q-date v-model="startingDate" @input="closeDialog(starting_calendar)" />
-                                    </q-popup-proxy>
-                                </q-icon>
-                            </template>
-                        </q-input>
-                    </div>
-                    <div class="col-3 self-start q-pa-md">
-                        <q-input dense filled v-model="endingDate" mask="date" :rules="['date']" placeholder="Ending date" hint="Date to"  color="deep-orange-7">
-                            <template v-slot:append>
-                                <q-icon name="event" class="cursor-pointer">
-                                    <q-popup-proxy ref="qDateProxy" transition-show="scale" transition-hide="scale" v-model="ending_calendar">
-                                        <q-date v-model="endingDate" @input="closeDialog(ending_calendar)" />
-                                    </q-popup-proxy>
-                                </q-icon>
-                            </template>
-                        </q-input>
-                    </div>
-                    <div class="col-3 offset-1 self-start q-pa-md" v-show="soi_status">
-                        <q-btn-dropdown
-                            color="grey-10"
-                            push
-                            no-caps
-                            @click="onMainClick"
-                            transition="slide-right"
-                        >
-                            <template v-slot:label>
-                                <div class="row items-center no-wrap">
-                                    <q-icon color="yellow-8" left :name="dropdown_icon" />
-                                    <div class="text-center">
-                                        {{dropdown_label}}
-                                    </div>
-                                </div>
-                            </template>
-
-                            <q-list>
-                                <q-item clickable v-close-popup @click="onItemClick('Self Employed', 'work')">
-                                    <q-item-section avatar>
-                                        <q-avatar icon="work" color="cyan-10" text-color="white" />
-                                    </q-item-section>
-                                    <q-item-section>
-                                        <q-item-label>Self employed</q-item-label>
-                                    </q-item-section>
-                                </q-item>
-                                <q-item clickable v-close-popup @click="onItemClick('Business', 'business')">
-                                    <q-item-section avatar>
-                                        <q-avatar icon="business" color="cyan-10" text-color="white" />
-                                    </q-item-section>
-                                    <q-item-section>
-                                        <q-item-label>Business</q-item-label>
-                                    </q-item-section>
-                                </q-item>
-                            </q-list>
-                        </q-btn-dropdown>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- <keep-alive> -->
-            <router-view />
-        <!-- </keep-alive> -->
+        <router-view />
     </q-page-container>
   </q-layout>
 </template>
@@ -327,15 +260,6 @@ export default {
                 this.ending_calendar = false
             }
         },
-        
-        onMainClick() {
-
-        },
-
-        onItemClick(item, icon) {
-            this.dropdown_label = item
-            this.dropdown_icon = icon
-        }
     },
 
     computed: {
