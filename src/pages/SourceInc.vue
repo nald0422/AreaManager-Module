@@ -26,41 +26,28 @@
                         </q-input>
                     </div>
                     <div class="col-3 offset-1 self-start q-pa-md">
-                        <q-btn-dropdown
-                                color="grey-10"
-                                push
-                                no-caps
-                                @click="onMainClick"
-                                transition="slide-right"
+                        <q-select 
+                            dense 
+                            v-model="soi_model" 
+                            :options="soi_options" 
+                            label="Source of Income"
+                            transition-show="jump-up"
+                            transition-hide="jump-up"
+                            options-selected-class="text-yellow-9"
                         >
-                            <template v-slot:label>
-                                <div class="row items-center no-wrap">
-                                    <q-icon color="yellow-8" left :name="dropdown_style.icon" />
-                                    <div class="text-center">
-                                        {{dropdown_style.label}}
-                                    </div>
-                                </div>
-                            </template>
+                            <template v-slot:option="scope">
+                                <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
+                                    <q-item-section avatar>
+                                        <q-icon :name="scope.opt.icon" />
+                                    </q-item-section>
 
-                            <q-list>
-                                <q-item clickable v-close-popup @click="onItemClick('Self Employed', 'work')">
-                                    <q-item-section avatar>
-                                        <q-avatar icon="work" color="grey-10" text-color="yellow-8" />
-                                    </q-item-section>
                                     <q-item-section>
-                                        <q-item-label>Self employed</q-item-label>
+                                        <q-item-label v-html="scope.opt.label" />
+                                        <q-item-label caption>{{ scope.opt.description }}</q-item-label>
                                     </q-item-section>
                                 </q-item>
-                                <q-item clickable v-close-popup @click="onItemClick('Business', 'business')">
-                                    <q-item-section avatar>
-                                        <q-avatar icon="business" color="grey-10" text-color="yellow-8" />
-                                    </q-item-section>
-                                    <q-item-section>
-                                        <q-item-label>Business</q-item-label>
-                                    </q-item-section>
-                                </q-item>
-                            </q-list>
-                        </q-btn-dropdown>
+                            </template>
+                        </q-select>
                     </div>
                 </div>
             </div>
@@ -86,26 +73,17 @@
                     <q-icon 
                         name="fas fa-filter" 
                         size="xs" dense round 
-                        color="grey-10" />
+                        color="deep-orange-8" />
                 </template>
-                <q-input
-                    ref="input"     
-                    color = "yellow-8" filled dense 
-                    label="Search"
-                    v-model="user_filter_input"
-                    square
-                    autofocus
-                />
+                <q-btn flat dense glossy label="Search" color="deep-orange-8" />
                 </q-banner>
-                    <q-list dense padding class="rounded-borders filtered-list">
-                            <q-item clickable v-ripple v-for="filtered_user in filtered_users" :key="filtered_user">
-                                <q-item-section>
-                                    <!-- <q-checkbox v-model="selected_filtered_users" :val="filtered_user" color="deep-orange-7" :label="filtered_user" /> -->
-                                    <input type="checkbox" :id="filtered_user" :value="{userId: filtered_user}" v-model="selected_filtered_users" :label="filtered_user">
-                                    <label for="filtered_user">{{filtered_user}}</label>
-                                </q-item-section>
-                            </q-item>
-                    </q-list>
+                <q-option-group
+                    :options="option_users"
+                    label="Users"
+                    type="checkbox"
+                    v-model="selected_filtered_users"
+                    class = "q-ml-sm"
+                />
                 </q-popup-proxy>
             </q-th>
         </template>
@@ -131,7 +109,7 @@
                 />
                 </q-banner>
                     <q-list dense padding class="rounded-borders filtered-list">
-                            <q-item clickable v-ripple v-for="filtered_id in filtered_ids" :key="filtered_id">
+                            <q-item clickable v-ripple v-for="filtered_id in unique_id" :key="filtered_id">
                                 <q-item-section>
                                     <q-checkbox v-model="selected_filtered_id" :val="filtered_id" color="yellow-8" :label="filtered_id" />
                                 </q-item-section>
@@ -162,11 +140,11 @@
                 />
                 </q-banner>
                     <q-list dense padding class="rounded-borders filtered-list">
-                            <q-item clickable v-ripple v-for="filtered_title in filtered_titles" :key="filtered_title">
-                                <q-item-section>
-                                    <q-checkbox v-model="selected_filtered_title" :val="filtered_title" color="yellow-8" :label="filtered_title" />
-                                </q-item-section>
-                            </q-item>
+                        <q-item clickable v-ripple v-for="filtered_title in filtered_titles" :key="filtered_title">
+                            <q-item-section>
+                                <q-checkbox v-model="selected_filtered_title" :val="filtered_title" color="yellow-8" :label="filtered_title" />
+                            </q-item-section>
+                        </q-item>
                     </q-list>
                 </q-popup-proxy>
             </q-th>
@@ -398,21 +376,40 @@ export default {
 
             source_list: [],
             source_data: [],
-            user_data: [],
             amId: '',
 
             starting_calendar: false,
             ending_calendar: false,
             startingDate: date.formatDate(Date.now(), 'YYYY/MM/DD'),
             endingDate: date.formatDate(Date.now(), 'YYYY/MM/DD'),    
-
-            dropdown_selected: '',
-            dropdown_style: {
-                label: 'Source of Income',
-                icon: 'money',
-            },
             
             soi_application_filter: '',
+
+
+
+            soi_model: {
+                label: 'Employment',
+                value: 'employment',
+                icon: 'work'
+            },
+
+            soi_options: [
+                {
+                    label: 'Employment',
+                    value: 'employment',
+                    icon: 'work'
+                }, 
+                {
+                    label: 'Business',
+                    value: 'business',
+                    icon: 'business'
+                }, 
+                {
+                    label: 'Agriculture',
+                    value: 'agriculture',
+                    icon: 'spa'
+                }
+            ],
             
             user_filter_input: '',
             id_filter_input: '',
@@ -430,8 +427,11 @@ export default {
             unique_id: [],
             unique_title: [],
             unique_body: [],
-            
+
+            option_users: [],
+
             selected_filtered_users: [],
+
             selected_filtered_id: [],
             selected_filtered_title: [],
             selected_filtered_body: [],
@@ -442,7 +442,11 @@ export default {
 
     computed: {
         baseUri() {
-            return this.$store.state.util.base_uri;
+            return this.$store.state.util.base_uri
+        },
+
+        userModel() {
+            return this.$store.state.userModel.user_data
         },
 
         getDateFrom() {
@@ -454,25 +458,25 @@ export default {
         },
 
         filtered_users() {
-            return this.unique_users.filter((element) => {
+            return this.option_users.filter((element) => {
                 return element.match(this.user_filter_input);
             })
         },
 
         filtered_ids() {
-            return this.unique_id.filter((element) => {
+            return this.duplicate_id.filter((element) => {
                 return element.match(this.id_filter_input);
             })
         },
 
         filtered_titles() {
-            return this.unique_title.filter((element) => {
+            return this.duplicate_title.filter((element) => {
                 return element.match(this.title_filter_input);
             })
         },
 
         filtered_bodies() {
-            return this.unique_body.filter((element) => {
+            return this.duplicate_body.filter((element) => {
                 return element.match(this.body_filter_input);
             })
         },
@@ -481,7 +485,10 @@ export default {
     watch: {
         selected_filtered_users: function() {
             console.log("Data : " + JSON.stringify(this.selected_filtered_users))
-            // this.getUserId(this.selected_filtered_users)
+        },
+
+        soi_model: function() {
+            this.getSourceOfIncome()
         },
 
         startingDate: function() {
@@ -502,19 +509,40 @@ export default {
                     });
                 });
             });
-            //.map(function (o) {
-            //    return o.title;
-            //});
         },
 
-        getSourceOfIncome(income) {
-            // var url = this.baseUri.concat(income+"/"+amId+"/"+dateFrom+"/"+dateTo);
-            //     this.$axios
-            //     .get(url)
-            //     .then(response => {
-            //         this.source_data = response["date"]
-            //     })
-            //     .catch(error => console.log(error))
+        getSourceOfIncome() {
+            var config = {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin' : '*',
+                    'Access-Control-Allow-Credentials': 'true',
+                    'Access-Control-Allow-Methods': 'GET,HEAD,OPTIONS,POST,PUT',
+                    'Access-Control-Allow-Headers': 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers',
+                    'Authorization': "bearer " + this.user_data[1].token,
+                    }
+            };
+
+            console.log("User token : " + this.user_data[1].token)
+
+            var bodyParameters = {
+                key: "value"
+            }
+
+            var dateFrom = date.formatDate(this.startingDate, 'YYYY-MM-DD')
+            var dateTo = date.formatDate(this.endingDate, 'YYYY-MM-DD')
+
+            this.$axios
+            .get('http://192.168.2.119:3000/areamanager/query/sourceincome/list/'
+                    +this.soi_model.value+'/2015000015/'+dateFrom+'/'+dateTo,
+                    config)
+            .then(response => {
+                console.log('Source Data: ' + response.data)
+                // this.source_data = response.data
+            })
+            .catch(error => console.log(error))
+
+            console.log('Configuration : ' + config)
         },
 
         getEmployeeList() {
@@ -546,18 +574,6 @@ export default {
             }
         },
 
-        onItemClick(item, icon) {
-            this.dropdown_style.label = item
-            this.dropdown_style.icon = icon
-
-            if(item === "Self Employed") {
-                dropdown_selected = "employment"
-            } else if (item === "Business") {
-                dropdown_selcted = "business"
-            }
-
-        },
-
         onMainClick() {
         
         },
@@ -572,6 +588,8 @@ export default {
     },
 
     created() {
+        
+
         this.loading = true
         this.$axios
         .get("https://jsonplaceholder.typicode.com/posts")
@@ -581,39 +599,40 @@ export default {
             // console.log("Data : " + JSON.stringify(response.data))
             this.loading = false
             this.source_data.forEach(element => {
-                this.duplicate_users.push(JSON.stringify(element.userId))
+                this.duplicate_users.push(element.userId)
                 this.duplicate_id.push(JSON.stringify(element.id))
                 this.duplicate_title.push(JSON.stringify(element.title))
                 this.duplicate_body.push(JSON.stringify(element.body))
             });
-            
+
             this.unique_users = Array.from(new Set(this.duplicate_users))
             this.unique_id = Array.from(new Set(this.duplicate_id))
             this.unique_title = Array.from(new Set(this.duplicate_title))
             this.unique_body = Array.from(new Set(this.duplicate_body))
+
+            this.unique_users.forEach(element => {
+                this.option_users.push({label: JSON.stringify(element), value: {userId: element}, color: 'deep-orange-8'})
+            });
+            
+            
         })
         .catch(error => console.log(error))
-
-
-        // console.log("date from :" + this.getDateFrom)
-        // console.log("date to : " + this.getDateTo)
 
         console.log("selected : " + this.selected_filtered_users)
         console.log("Filtered : " +  this.getUserId(this.selected_filtered_users))
 
+
+
         this.$axios
         .post("http://192.168.2.119:3000/user/login", {username: 'ZG9uYWxk', password: 'Zjk3YThkZWZkMDI5N2YxNDBiNjU0N2FkNTcxNGVkZWE='})
         .then(response => {
-            console.log("Login Api: " + JSON.stringify(response.data))
+            this.user_data = response.data
+            console.log("Login Api: " + JSON.stringify(this.user_data[0].userModel[0].user_id))
+            localStorage.setItem('authToken', this.user_data[1].token)
+            // this.getSourceOfIncome()
         })
         .catch(error => console.log(error))
-
-        // this.edit_soi(true)
     },  
-
-    beforeDestroy() {
-        // this.edit_soi(false)
-    }
 }
 </script>
 

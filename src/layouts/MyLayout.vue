@@ -19,8 +19,8 @@
         <q-space />
         <div class="q-gutter-sm row items-center no-wrap">
           <q-btn round flat>
-            <q-avatar size="26px">
-              <img src="https://cdn.quasar.dev/img/boy-avatar.png">
+            <q-avatar size="30px" icon="person">
+              
             </q-avatar>
             <q-menu square fit anchor="bottom left" self="top left" content-class="bg-grey-10 text-white" :offset="[50, 11]">
                 <q-list style="min-width: 100px">
@@ -38,7 +38,7 @@
                     </q-item>
                 </q-list>
             </q-menu>
-            <q-tooltip>Account</q-tooltip>
+            <q-tooltip content-class="bg-purple">Account</q-tooltip>
           </q-btn>
         </div>
       </q-toolbar>
@@ -198,10 +198,10 @@ export default {
             byWebsite: '',
             byDate: 'Any time',
             links1: [
-                { icon: 'check', text: 'Appproved Applications', color: 'yellow-7', route: '/approvedApp' },
-                { icon: 'group_work', text: 'Applications by Age', color: 'yellow-7', route: '/appByAge' },
-                { icon: 'attach_money', text: 'Source of Income', color: 'yellow-7', route: '/sourceIncome' },
-                { icon: 'games', text: 'Playground', color: 'yellow-7', route: '/playground' },
+                { icon: 'check', text: 'Appproved Applications', color: 'yellow-8', route: '/approvedApp' },
+                { icon: 'group_work', text: 'Applications by Age', color: 'yellow-8', route: '/appByAge' },
+                { icon: 'attach_money', text: 'Source of Income', color: 'yellow-8', route: '/sourceIncome' },
+                { icon: 'games', text: 'Playground', color: 'yellow-8', route: '/playground' },
             ],
 
             dropdown_label: 'Source of Income',
