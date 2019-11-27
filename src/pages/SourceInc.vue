@@ -34,6 +34,7 @@
                             transition-show="jump-up"
                             transition-hide="jump-up"
                             options-selected-class="text-yellow-9"
+                            color="yellow-9"
                         >
                             <template v-slot:option="scope">
                                 <q-item v-bind="scope.itemProps" v-on="scope.itemEvents">
@@ -54,9 +55,10 @@
         </div>
     <q-table
       title="Treats"
-      :data="source_data"
+      :data="filter_data"
       :columns="columns"
       :filter="soi_application_filter"
+      :filter-method="myFilter"
       row-key="id"
       :loading="loading"
       dense
@@ -74,8 +76,15 @@
                         name="fas fa-filter" 
                         size="xs" dense round 
                         color="deep-orange-8" />
-                </template>
-                <q-btn flat dense glossy label="Search" color="deep-orange-8" />
+                </template>0
+                <q-input
+                    ref="input"     
+                    color = "deep-orange" filled dense 
+                    label="Search"
+                    v-model="id_filter_input"
+                    square
+                    autofocus
+                />
                 </q-banner>
                 <q-option-group
                     :options="option_users"
@@ -374,9 +383,8 @@ export default {
                 ]
             ],
 
-            source_list: [],
             source_data: [],
-            amId: '',
+            filter_data: [],
 
             starting_calendar: false,
             ending_calendar: false,
@@ -384,8 +392,6 @@ export default {
             endingDate: date.formatDate(Date.now(), 'YYYY/MM/DD'),    
             
             soi_application_filter: '',
-
-
 
             soi_model: {
                 label: 'Employment',
@@ -415,8 +421,6 @@ export default {
             id_filter_input: '',
             title_filter_input: '',
             body_filter_input: '',
-            
-            filter_users: [],
 
             duplicate_users: [],
             duplicate_id: [],
@@ -431,7 +435,6 @@ export default {
             option_users: [],
 
             selected_filtered_users: [],
-
             selected_filtered_id: [],
             selected_filtered_title: [],
             selected_filtered_body: [],
@@ -484,7 +487,22 @@ export default {
 
     watch: {
         selected_filtered_users: function() {
-            console.log("Data : " + JSON.stringify(this.selected_filtered_users))
+            console.log("Data : " + this.selected_filtered_users)
+
+            var toSearch = this.selected_filtered_users
+            console.log('To search: ' + toSearch)
+            if (toSearch.length < 1) 
+            {
+                return this.filter_data = this.source_data
+            }
+            else 
+            {
+                this.filter_data = this.source_data.filter(function(e) 
+                {
+                    return toSearch.includes(e.userId)
+                });
+            }
+            // console.log('Matched: ' + JSON.stringify(result))
         },
 
         soi_model: function() {
@@ -509,6 +527,13 @@ export default {
                     });
                 });
             });
+        },
+
+        myFilter (rows, terms, cols, cellValue) {
+            const lowerTerms = terms ? terms.toLowerCase() : ''
+            return rows.filter(
+                row => cols.some(col => (cellValue(col, row) + '').toLowerCase().indexOf(lowerTerms) !== -1)
+            )
         },
 
         getSourceOfIncome() {
@@ -543,6 +568,10 @@ export default {
             .catch(error => console.log(error))
 
             console.log('Configuration : ' + config)
+
+            array.forEach(element => {
+                
+            });
         },
 
         getEmployeeList() {
@@ -550,7 +579,11 @@ export default {
         },
 
         edit_soi(status){
-            this.$store.commit('components/mutate_soi_comp', status);
+            this.$store.commit('components/mutate_soi_comp', status)
+        },
+
+        set_user(user) {
+            this.$store.commit('userModel/mutate_user', user)
         },
 
         print_json() {
@@ -596,6 +629,7 @@ export default {
         .then(response => {
             // console.log(JSON.stringify(response.data));
             this.source_data = response.data
+            this.filter_data = this.source_data
             // console.log("Data : " + JSON.stringify(response.data))
             this.loading = false
             this.source_data.forEach(element => {
@@ -611,9 +645,10 @@ export default {
             this.unique_body = Array.from(new Set(this.duplicate_body))
 
             this.unique_users.forEach(element => {
-                this.option_users.push({label: JSON.stringify(element), value: {userId: element}, color: 'deep-orange-8'})
+                this.option_users.push({label: JSON.stringify(element), value: element, color: 'deep-orange-8'})
             });
             
+            // myFilter(rows, terms, cols, cellValue)
             
         })
         .catch(error => console.log(error))
@@ -621,14 +656,15 @@ export default {
         console.log("selected : " + this.selected_filtered_users)
         console.log("Filtered : " +  this.getUserId(this.selected_filtered_users))
 
-
-
         this.$axios
         .post("http://192.168.2.119:3000/user/login", {username: 'ZG9uYWxk', password: 'Zjk3YThkZWZkMDI5N2YxNDBiNjU0N2FkNTcxNGVkZWE='})
         .then(response => {
             this.user_data = response.data
+            this.set_user(this.user_data)
+            console.log("Data: " + JSON.stringify(this.user_data))
             console.log("Login Api: " + JSON.stringify(this.user_data[0].userModel[0].user_id))
             localStorage.setItem('authToken', this.user_data[1].token)
+
             // this.getSourceOfIncome()
         })
         .catch(error => console.log(error))
@@ -652,3 +688,4 @@ export default {
         box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2), 0 2px 2px rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12);
         padding: 5px
 </style>
+

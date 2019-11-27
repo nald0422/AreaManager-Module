@@ -48,9 +48,12 @@ module.exports = function (ctx) {
       directives: [],
 
       // Quasar plugins
-      plugins: [],
+      plugins: [
+          'Notify'
+      ],
       
       config: {
+        notify:  { /* Notify defaults */ },
         loading: { /* Loading defaults */ }
       }
     },
@@ -133,7 +136,7 @@ module.exports = function (ctx) {
 
     // https://quasar.dev/quasar-cli/developing-cordova-apps/configuring-cordova
     cordova: {
-      // id: 'org.cordova.am.module',
+      id: 'org.cordova.am.module',
       // noIosLegacyBuildFlag: true, // uncomment only if you know what you are doing
     },
 
@@ -150,7 +153,7 @@ module.exports = function (ctx) {
         // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
 
         // OS X / Mac App Store
-        // appBundleId: '',
+        // appBundleId: '', 
         // appCategoryType: '',
         // osxSign: '',
         // protocol: 'myapp://path',
@@ -159,7 +162,7 @@ module.exports = function (ctx) {
         // win32metadata: { ... }
       },
 
-      builder: {
+      builder: { 
         // https://www.electron.build/configuration/configuration
 
         // appId: 'areamanager-module'

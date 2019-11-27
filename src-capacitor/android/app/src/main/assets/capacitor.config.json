@@ -1,0 +1,10 @@
+{
+  "appId": "org.cordova.am.module",
+  "appName": "areamanager-module",
+  "bundledWebRuntime": false,
+  "npmClient": "yarn",
+  "webDir": "www",
+  "server": {
+    "url": "http://192.168.80.17:8081"
+  }
+}
