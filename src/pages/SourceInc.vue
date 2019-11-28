@@ -655,19 +655,7 @@ export default {
 
         console.log("selected : " + this.selected_filtered_users)
         console.log("Filtered : " +  this.getUserId(this.selected_filtered_users))
-
-        this.$axios
-        .post("http://192.168.2.119:3000/user/login", {username: 'ZG9uYWxk', password: 'Zjk3YThkZWZkMDI5N2YxNDBiNjU0N2FkNTcxNGVkZWE='})
-        .then(response => {
-            this.user_data = response.data
-            this.set_user(this.user_data)
-            console.log("Data: " + JSON.stringify(this.user_data))
-            console.log("Login Api: " + JSON.stringify(this.user_data[0].userModel[0].user_id))
-            localStorage.setItem('authToken', this.user_data[1].token)
-
-            // this.getSourceOfIncome()
-        })
-        .catch(error => console.log(error))
+        // this.getSourceOfIncome()
     },  
 }
 </script>

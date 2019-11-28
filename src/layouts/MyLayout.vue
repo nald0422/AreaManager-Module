@@ -13,7 +13,7 @@
         />
 
         <q-toolbar-title v-if="$q.screen.gt.xs" shrink class="row items-center no-wrap">
-          <span class="q-ml-sm">Area Manager</span>
+          <span class="q-ml-sm text-deep-orange-5">Area Manager</span>
         </q-toolbar-title>
         <q-space />
         <q-space />
@@ -24,7 +24,7 @@
             </q-avatar>
             <q-menu square fit anchor="bottom left" self="top left" content-class="bg-grey-10 text-white" :offset="[50, 11]">
                 <q-list style="min-width: 100px">
-                    <q-item clickable v-ripple>
+                    <q-item clickable v-ripple @click="signOff()">
                         <q-item-section avatar>
                             <q-icon name = "trending_flat"></q-icon>
                         </q-item-section>
@@ -198,10 +198,9 @@ export default {
             byWebsite: '',
             byDate: 'Any time',
             links1: [
-                { icon: 'check', text: 'Appproved Applications', color: 'yellow-8', route: '/approvedApp' },
-                { icon: 'group_work', text: 'Applications by Age', color: 'yellow-8', route: '/appByAge' },
-                { icon: 'attach_money', text: 'Source of Income', color: 'yellow-8', route: '/sourceIncome' },
-                { icon: 'games', text: 'Playground', color: 'yellow-8', route: '/playground' },
+                { icon: 'check', text: 'Appproved Applications', color: 'grey-1', route: '/approvedApp' },
+                { icon: 'group_work', text: 'Applications by Age', color: 'grey-1', route: '/appByAge' },
+                { icon: 'attach_money', text: 'Source of Income', color: 'grey-1', route: '/sourceIncome' },
             ],
 
             dropdown_label: 'Source of Income',
@@ -240,6 +239,17 @@ export default {
     },
 
     methods: {
+
+        signOff() {
+            this.$q.cookies.remove('authToken')
+            this.remove_user()
+            this.$router.push('/login')
+        },
+
+        remove_user() {
+            this.$store.commit('userModel/mutate_remove_user')
+        },
+
         onClear () {
         this.exactPhrase = ''
         this.hasWords = ''

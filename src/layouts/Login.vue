@@ -15,14 +15,14 @@
                             <q-form action="" class="log-in" autocomplete="off"> 
                                 <h4>Module: <span>Area Manager</span></h4>
                                 <div class="floating-label">
-                                    <input placeholder="Username" type="text" name="username" id="username" autocomplete="off">
+                                    <input v-model="user_username" placeholder="Username" type="text" name="username" id="username" autocomplete="off">
                                     <label for="username">Username:</label>
                                 </div>
                                 <div class="floating-label">
-                                    <input placeholder="Password" type="password" name="password" id="password" autocomplete="off">
+                                    <input v-model="user_password" placeholder="Password" type="password" name="password" id="password" autocomplete="off">
                                     <label for="password">Password:</label>
                                 </div>
-                                <q-btn dense @click="showNotif()">Log in</q-btn>
+                                <q-btn dense @click="onSubmit()">Log in</q-btn>
                             </q-form>
                         </div>
                     </div>
@@ -36,21 +36,52 @@
 export default {
     data() {
         return {
-            notificationMessage: "Incorrect Username or Password"
+            notification: {
+                color: 'red-6',
+                icon: 'close'
+            },
+
+            user_username: '',
+            user_password: ''
         }
     },
 
     methods: {
         onSubmit(e) {
-            this.showNotif();
-            e.preventDefault();
+            var md5 = require('md5')
+
+            this.$axios
+            .post('http://192.168.2.119:3000/user/login', {username: window.btoa(this.user_username), password: window.btoa(md5(this.user_password))})
+            .then(response => {
+                if (response.data.length < 1) {
+                    this.showNotif('Incorrect Username or Password')
+                } 
+                else {
+                    this.set_user(response.data[0].userModel[0])
+
+                    // Cookies.set('authToken', response.data[1].token)
+                    this.$q.cookies.set('authToken', response.data[1].token)
+
+                    console.log('cookie : ' + this.$q.cookies.get('authToken'))
+
+                    this.$router.push('/dashboard')
+                }
+            })
+            .catch(error => {
+                console.log('Error : ' + error)
+                this.showNotif('Error: Request failed with status code ' +error.response.status)
+            })
         },
 
-        showNotif() {
+        set_user(user) {
+            this.$store.commit('userModel/mutate_set_user', user)
+        },
+
+        showNotif(message) {
             this.$q.notify({
-                message: this.notificationMessage,
-                color: 'red-6',
-                icon: 'close'
+                message: message,
+                color: this.notification.color,
+                icon: this.notification.icon
             })
         }
     }

@@ -9,7 +9,7 @@ module.exports = function (ctx) {
     boot: [
       'i18n',
       'axios',
-      'printJS'
+      'printJS',
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
@@ -49,7 +49,8 @@ module.exports = function (ctx) {
 
       // Quasar plugins
       plugins: [
-          'Notify'
+          'Notify',
+          'Cookies'
       ],
       
       config: {
